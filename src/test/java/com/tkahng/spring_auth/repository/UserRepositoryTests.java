@@ -35,13 +35,15 @@ public class UserRepositoryTests {
 
     @Test
     public void testThatMultipleUsersCanBeCreatedAndRecalled() {
-        User UserA = TestDataUtil.createTestAuthor();
-        underTest.save(UserA);
-        User UserB = TestDataUtil.createTestAuthor();
-        underTest.save(UserB);
+        User userA = TestDataUtil.createTestAuthor();
+        userA.setEmail("emaila");
+        underTest.save(userA);
+        User useB = TestDataUtil.createTestAuthor();
+        useB.setEmail("emailb");
+        underTest.save(useB);
         Iterable<User> result = underTest.findAll();
         assertThat(result)
                 .hasSize(2)
-                .containsExactly(UserA, UserB);
+                .containsExactly(userA, useB);
     }
 }

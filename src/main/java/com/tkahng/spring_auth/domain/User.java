@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
@@ -48,10 +49,12 @@ public class User {
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
+    @ColumnDefault("now()")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
+    @ColumnDefault("now()")
     private LocalDateTime updatedAt;
 
 }
