@@ -7,5 +7,7 @@ import java.util.Optional;
 
 public interface AuthService {
     Optional<User> findUserByEmail(String email);
-    Optional<Account> findAccountByUserIdAndProviderId(String userId, String accountId);
+    Optional<Account> findAccountByUserIdAndProviderId(String userId, String providerId);
+
+
 }
