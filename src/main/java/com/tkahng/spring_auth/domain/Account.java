@@ -1,20 +1,19 @@
 package com.tkahng.spring_auth.domain;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
 
 @Data
 @AllArgsConstructor
@@ -22,26 +21,35 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "users")
-public class User {
-
+@Table(name = "accounts")
+public class Account {
     @Id
     @GeneratedValue
     @UuidGenerator
     private String id;
 
-    @Column(nullable = true)
-    private String name;
-
-    @Column(nullable = false, unique = true)
-    private String email;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
-    private boolean emailVerified;
-
+    private String accountId;
+    @Column(nullable = false)
+    private String providerId;
     @Column(nullable = true)
-    private String image;
+    private String accessToken;
+    @Column(nullable = true)
+    private String refreshToken;
+    @Column(nullable = true)
+    private String accessTokenExpiresAt;
+    @Column(nullable = true)
+    private String refreshTokenExpiresAt;
+    @Column(nullable = true)
+    private String scope;
+    @Column(nullable = true)
+    private String idToken;
+    @Column(nullable = true)
+    private String password;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
@@ -52,7 +60,4 @@ public class User {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "user")
-    private List<Account> accounts;
 }
