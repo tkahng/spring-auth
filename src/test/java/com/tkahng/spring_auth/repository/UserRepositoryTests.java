@@ -25,8 +25,8 @@ public class UserRepositoryTests {
     @Test
     public void testThatUserCanBeCreatedAndRecalled() {
         User user = new User();
-        user.setName("name");
-        user.setEmail("email");
+        user.setName("name1");
+        user.setEmail("email1");
         user.setAccounts(new java.util.ArrayList<>());
         underTest.save(user);
         Optional<User> result = underTest.findById(user.getId());

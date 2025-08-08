@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "accounts")
+@Table(name = "accounts", uniqueConstraints = {@UniqueConstraint(name = "user_id_provider_id_unique", columnNames = {"user_id", "provider_id"})})
 public class Account {
     @Id
     @GeneratedValue

@@ -28,14 +28,14 @@ public class AccountRepositoryTests {
     @Test
     public void testThatAccountCanBeCreatedAndRecalled() {
         User user = new User();
-        user.setName("name");
-        user.setEmail("email");
+        user.setName("name2");
+        user.setEmail("email2");
         userRepository.save(user);
         User managedUser = userRepository.findById(user.getId()).orElseThrow();
         Account account = new Account();
         account.setUser(managedUser);
-        account.setAccountId("accountId");
-        account.setProviderId("providerId");
+        account.setAccountId("accountId1");
+        account.setProviderId("providerId1");
         underTest.save(account);
         Optional<Account> result = underTest.findById(account.getId());
         assertThat(result).isPresent();
@@ -44,4 +44,51 @@ public class AccountRepositoryTests {
         assertThat(resultAccount).isEqualTo(account);
     }
 
+    @Test
+    public void testThatMultipleAccountsCanBeCreatedAndRecalled() {
+        User user = TestDataUtil.createTestAuthor();
+        user.setName("name3");
+        user.setEmail("email3");
+        userRepository.save(user);
+        User managedUser = userRepository.findById(user.getId()).orElseThrow();
+        Account accountA = new Account();
+        accountA.setUser(managedUser);
+        accountA.setAccountId("accountId2A");
+        accountA.setProviderId("providerId2A");
+        underTest.save(accountA);
+        Account accountB = new Account();
+        accountB.setUser(managedUser);
+        accountB.setAccountId("accountId2B");
+        accountB.setProviderId("providerId2B");
+        underTest.save(accountB);
+        Iterable<Account> result = underTest.findAll();
+        result.forEach(account -> account.setUser(managedUser));
+        assertThat(result)
+                .hasSize(2)
+                .containsExactly(accountA, accountB);
+    }
+
+    @Test
+    public void testThatAccountsWithSameProviderIdCannotBeCreated(){
+        User user = TestDataUtil.createTestAuthor();
+        user.setName("name4");
+        user.setEmail("email4");
+        userRepository.save(user);
+        User managedUser = userRepository.findById(user.getId()).orElseThrow();
+        Account accountA = new Account();
+        accountA.setUser(managedUser);
+        accountA.setAccountId("accountId3A");
+        accountA.setProviderId("providerId3A");
+        underTest.save(accountA);
+        Account accountB = new Account();
+        accountB.setUser(managedUser);
+        accountB.setAccountId("accountId3B");
+        accountB.setProviderId("providerId3A");
+        try{
+            underTest.save(accountB);
+        } catch (Exception e){
+            assertThat(e.getMessage()).contains("Unique index or primary key violation");
+        }
+
+    }
 }
