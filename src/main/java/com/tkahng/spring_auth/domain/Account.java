@@ -26,6 +26,7 @@ public class Account {
     @Id
     @GeneratedValue
     @UuidGenerator
+    @Column(columnDefinition = "UUID")
     private String id;
 
     @ManyToOne
