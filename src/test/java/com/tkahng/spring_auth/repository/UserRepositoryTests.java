@@ -47,7 +47,7 @@ public class UserRepositoryTests {
         useB.setAccounts(new java.util.ArrayList<>());
         underTest.save(useB);
         Iterable<User> result = underTest.findAll();
-         result.forEach(user -> user.setAccounts(new java.util.ArrayList<>()));
+        result.forEach(user -> user.setAccounts(new java.util.ArrayList<>()));
         assertThat(result)
                 .hasSize(2)
                 .containsExactly(userA, useB);

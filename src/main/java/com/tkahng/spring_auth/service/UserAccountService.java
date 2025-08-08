@@ -6,19 +6,17 @@ import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UserAccountService  {
+public class UserAccountService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
 
-    public UserAccountService(UserRepository userRepository, AccountRepository accountRepository ) {
+    public UserAccountService(UserRepository userRepository, AccountRepository accountRepository) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
     }
@@ -33,13 +31,13 @@ public class UserAccountService  {
 
     public UserAccount findUserAccountByEmailAndProviderId(String email, String providerId) {
         var userAccount = new UserAccount();
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = findUserByEmail(email);
         if (user.isEmpty()) {
             return userAccount;
         }
         var userDetail = user.get();
         userAccount.setUser(userDetail);
-        Optional<Account> account = accountRepository.findByUserIdAndProviderId(userDetail.getId(), providerId);
+        Optional<Account> account = findAccountByUserIdAndProviderId(userDetail.getId(), providerId);
         if (account.isEmpty()) {
             return userAccount;
         }
@@ -52,23 +50,23 @@ public class UserAccountService  {
         var user = new User();
         user.setEmail(authDto.getEmail());
         user.setName(authDto.getName());
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
-    public UserAccount createUserAccount(@NotNull AuthDto authDto) {
-        var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProviderId());
-        if (existingUserAccount.getUser() != null) {
-            throw new EntityExistsException("User already exists");
-        }
-        var user = new User();
-        user.setEmail(authDto.getEmail());
+    public Account createAccount(@NotNull AuthDto authDto, User user) {
         var account = new Account();
         account.setProviderId(authDto.getProviderId());
         account.setPassword(authDto.getPassword());
-        user.setAccounts(new java.util.ArrayList<>());
-        user.getAccounts().add(account);
-        userRepository.save(user);
-        return new UserAccount(user, account);
+        account.setUser(user);
+        return accountRepository.save(account);
+    }
+
+    public UserAccount createUserAccount(@NotNull AuthDto authDto) {
+        var userAccount = new UserAccount();
+        var user = createUser(authDto);
+        userAccount.setUser(user);
+        var account = createAccount(authDto, user);
+        userAccount.setAccount(account);
+        return userAccount;
     }
 }

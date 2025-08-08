@@ -7,8 +7,8 @@ import lombok.Data;
 @Builder
 public class AuthDto {
     private String email;
+    private String password;
     private String name;
     private String providerId;
-    private String password;
     private String accountId;
 }

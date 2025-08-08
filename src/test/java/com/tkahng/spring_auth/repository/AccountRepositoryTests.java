@@ -69,7 +69,7 @@ public class AccountRepositoryTests {
     }
 
     @Test
-    public void testThatAccountsWithSameProviderIdCannotBeCreated(){
+    public void testThatAccountsWithSameProviderIdCannotBeCreated() {
         User user = TestDataUtil.createTestAuthor();
         user.setName("name4");
         user.setEmail("email4");
@@ -84,9 +84,9 @@ public class AccountRepositoryTests {
         accountB.setUser(managedUser);
         accountB.setAccountId("accountId3B");
         accountB.setProviderId("providerId3A");
-        try{
+        try {
             underTest.save(accountB);
-        } catch (Exception e){
+        } catch (Exception e) {
             assertThat(e.getMessage()).contains("Unique index or primary key violation");
         }
 
