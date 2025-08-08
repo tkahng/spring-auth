@@ -30,15 +30,18 @@ public class AccountRepositoryTests {
         User user = new User();
         user.setName("name");
         user.setEmail("email");
-        user = userRepository.save(user);
+        userRepository.save(user);
+        User managedUser = userRepository.findById(user.getId()).orElseThrow();
         Account account = new Account();
-        account.setUser(user);
+        account.setUser(managedUser);
         account.setAccountId("accountId");
         account.setProviderId("providerId");
-        account = underTest.save(account);
+        underTest.save(account);
         Optional<Account> result = underTest.findById(account.getId());
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(account);
+        var resultAccount = result.get();
+        resultAccount.setUser(managedUser);
+        assertThat(resultAccount).isEqualTo(account);
     }
 
 }
