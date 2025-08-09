@@ -55,7 +55,7 @@ public class UserAccountService {
 
     public Account createAccount(@NotNull AuthDto authDto, User user) {
         var account = new Account();
-        account.setProviderId(authDto.getProviderId());
+        account.setProviderId(authDto.getProvider().toString());
         account.setPassword(authDto.getPassword());
         account.setUser(user);
         return accountRepository.save(account);
