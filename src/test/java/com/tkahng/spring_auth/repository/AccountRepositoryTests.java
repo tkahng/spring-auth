@@ -6,14 +6,16 @@ import com.tkahng.spring_auth.domain.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
+@EnableJpaAuditing
 @ExtendWith(SpringExtension.class)
 public class AccountRepositoryTests {
     private final UserRepository userRepository;
@@ -46,7 +48,7 @@ public class AccountRepositoryTests {
 
     @Test
     public void testThatMultipleAccountsCanBeCreatedAndRecalled() {
-        User user = TestDataUtil.createTestAuthor();
+        User user = new User();
         user.setName("name3");
         user.setEmail("email3");
         userRepository.save(user);
