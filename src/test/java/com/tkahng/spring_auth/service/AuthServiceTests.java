@@ -10,9 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(properties = {
-        "jwt.key=VGhpcy1rZXktaXMtbG9uZyBlbm91Z2ggdG8tdXNlLWZvciBoczI1Ng==",
-        "spring.datasource.url=jdbc:postgresql://localhost:5432/db_test",
-        "spring.jpa.hibernate.ddl-auto=none"
-})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class AuthServiceTests {
     @Autowired
     private Flyway flyway;

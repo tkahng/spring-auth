@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
@@ -18,10 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest(showSql = true)
 @EnableJpaAuditing
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:postgresql://localhost:5432/db_test",
-        "spring.jpa.hibernate.ddl-auto=none"
-})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AccountRepositoryTests {
     private final UserRepository userRepository;

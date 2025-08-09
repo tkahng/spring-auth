@@ -33,13 +33,12 @@ public class SecurityConfig {
 
     @Bean
     public SecretKey secretKey() {
-        var newkey = "VGhpcy1rZXktaXMtbG9uZyBlbm91Z2ggdG8tdXNlLWZvciBoczI1Ng==";
         byte[] keyBytes;
         try {
             keyBytes = Base64.getDecoder()
-                    .decode(newkey);
+                    .decode(jwtKey);
         } catch (IllegalArgumentException ex) {
-            keyBytes = newkey.getBytes(StandardCharsets.UTF_8);
+            keyBytes = jwtKey.getBytes(StandardCharsets.UTF_8);
         }
 
         if (keyBytes.length < 32) {
