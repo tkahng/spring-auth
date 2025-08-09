@@ -105,14 +105,14 @@ create table if not exists public.accounts (
 CREATE TRIGGER handle_accounts_updated_at before
 update on public.accounts for each row execute procedure set_current_timestamp_updated_at();
 -- -------------- USER SESSIONS TABLE START -----------------------------------------------------------------------
-create table if not exists public.user_sessions (
+create table if not exists public.sessions (
     id uuid primary key default gen_random_uuid(),
     "user_id" uuid not null references public.users on delete cascade on update cascade,
     token text not null unique,
     expires timestamptz not null,
     created_at timestamptz default now(),
     updated_at timestamptz default now(),
-    constraint user_sessions_token_not_empty check (not_empty("token"))
+    constraint sessions_token_not_empty check (not_empty("token"))
 );
-CREATE TRIGGER handle_user_sessions_updated_at before
-update on public.user_sessions for each row execute procedure set_current_timestamp_updated_at();
+CREATE TRIGGER handle_sessions_updated_at before
+update on public.sessions for each row execute procedure set_current_timestamp_updated_at();
