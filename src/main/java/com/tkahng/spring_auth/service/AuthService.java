@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public interface UserAccountService {
+public interface AuthService {
     Optional<User> findUserByEmail(String email);
 
     Optional<Account> findAccountByUserIdAndProviderId(String userId, String providerId);
