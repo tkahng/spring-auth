@@ -4,24 +4,24 @@ import com.tkahng.spring_auth.domain.Account;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
+import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final PasswordService passwordService;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
 
-    public AuthServiceImpl(PasswordService passwordService, UserRepository userRepository, AccountRepository accountRepository) {
-        this.passwordService = passwordService;
-        this.userRepository = userRepository;
-        this.accountRepository = accountRepository;
-    }
 
     @Override
     public Optional<User> findUserByEmail(String email) {
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         return userRepository.save(user);
     }
 
-   
+
     @Override
     public Account createAccount(@NotNull AuthDto authDto, User user) {
         var account = new Account();
@@ -82,4 +82,36 @@ public class AuthServiceImpl implements AuthService {
         userAccount.setAccount(account);
         return userAccount;
     }
+
+    public AuthenticationResponse generateToken(@NotNull User user) throws Exception {
+        var accessToken = jwtService.generateToken(user.getEmail());
+        var refreshToken = refreshTokenService.generateRefreshToken(user.getEmail());
+        return new AuthenticationResponse(accessToken, refreshToken);
+    }
+
+    @Override
+    public AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception {
+        var userAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider().toString());
+        if (userAccount.getAccount() == null) {
+            throw new Exception("user account not found");
+        }
+        if (userAccount.getAccount().getPassword() == null) {
+            throw new Exception("password not found");
+        }
+        if (!passwordService.matches(authDto.getPassword(), userAccount.getAccount().getPassword())) {
+            throw new Exception("invalid password");
+        }
+        return generateToken(userAccount.getUser());
+    }
+
+    @Override
+    public AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception {
+        var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider().toString());
+        if (existingUserAccount.getUser() != null) {
+            throw new Exception("user already exists");
+        }
+        var userAccount = createUserAccount(authDto);
+        return generateToken(userAccount.getUser());
+    }
+
 }

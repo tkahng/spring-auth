@@ -25,7 +25,6 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "UUID")
     private String id;

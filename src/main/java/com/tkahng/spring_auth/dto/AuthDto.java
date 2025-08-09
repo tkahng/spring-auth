@@ -1,11 +1,11 @@
 package com.tkahng.spring_auth.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthDto {
     /**
      * email. must be unique. required
