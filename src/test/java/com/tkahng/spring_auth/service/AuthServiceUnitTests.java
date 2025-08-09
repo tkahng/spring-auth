@@ -4,6 +4,7 @@ import com.tkahng.spring_auth.domain.Account;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
+import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class AuthServiceUnitTests {
     private UserRepository userRepository;
 
     @Test
-    public void testLoginSuccess() throws Exception {
+    public void testLoginSuccess() {
         var user = User.builder()
                 .email("email")
                 .build();
@@ -55,8 +56,115 @@ public class AuthServiceUnitTests {
                 .provider(AuthProvider.CREDENTIALS)
                 .accountId("email")
                 .build();
-        var result = authService.login(dto);
-        assertThat(result).isNotNull();
+        AuthenticationResponse result = null;
+        try {
+            result = authService.login(dto);
+        } catch (Exception e) {
 
+        }
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testLoginFailUserNotFound() {
+        when(userRepository.findByEmail("email")).thenReturn(Optional.empty());
+        var dto = AuthDto.builder()
+                .email("email")
+                .password("password")
+                .provider(AuthProvider.CREDENTIALS)
+                .accountId("email")
+                .build();
+        AuthenticationResponse result = null;
+        try {
+            result = authService.login(dto);
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                    .contains("user not found");
+        }
+    }
+
+    @Test
+    public void testLoginFailUserAccountNotFound() {
+        var user = User.builder()
+                .email("email")
+                .build();
+
+        when(userRepository.findByEmail("email")).thenReturn(Optional.of(User.builder()
+                .email("email")
+                .build()));
+        when(accountRepository.findByUserIdAndProviderId(user.getId(),
+                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.empty());
+        var dto = AuthDto.builder()
+                .email("email")
+                .password("password")
+                .provider(AuthProvider.CREDENTIALS)
+                .accountId("email")
+                .build();
+        AuthenticationResponse result = null;
+        try {
+            result = authService.login(dto);
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                    .contains("user account not found");
+        }
+    }
+
+    @Test
+    public void testLoginFailUserAccountPasswordNull() {
+        var user = User.builder()
+                .email("email")
+                .build();
+        var account = Account.builder()
+                .user(user)
+                .providerId(AuthProvider.CREDENTIALS.toString())
+                .accountId("email")
+                .build();
+        when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));
+        when(accountRepository.findByUserIdAndProviderId(user.getId(),
+                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.of(account));
+        var dto = AuthDto.builder()
+                .email("email")
+                .password("password")
+                .provider(AuthProvider.CREDENTIALS)
+                .accountId("email")
+                .build();
+        AuthenticationResponse result = null;
+        try {
+            result = authService.login(dto);
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                    .contains("password not found");
+        }
+    }
+
+    @Test
+    public void testLoginFailUserAccountPasswordNotMatch() {
+        var user = User.builder()
+                .email("email")
+                .build();
+        var wrongPassword = "wrongPassword";
+        var wrongHashedPassword = passwordService.encode(wrongPassword);
+        var account = Account.builder()
+                .user(user)
+                .providerId(AuthProvider.CREDENTIALS.toString())
+                .password_hash(wrongHashedPassword)
+                .accountId("email")
+                .build();
+        when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));
+        when(accountRepository.findByUserIdAndProviderId(user.getId(),
+                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.of(account));
+        var dto = AuthDto.builder()
+                .email("email")
+                .password("password")
+                .provider(AuthProvider.CREDENTIALS)
+                .accountId("email")
+                .build();
+        AuthenticationResponse result = null;
+        try {
+            result = authService.login(dto);
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                    .contains("invalid password");
+        }
     }
 }

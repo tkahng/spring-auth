@@ -65,7 +65,8 @@ public class AuthServiceImpl implements AuthService {
     public Account createAccount(@NotNull AuthDto authDto, User user) {
         var account = new Account();
         account.setUser(user);
-        account.setProviderId(authDto.getProvider().toString());
+        account.setProviderId(authDto.getProvider()
+                .toString());
         account.setAccountId(authDto.getAccountId());
         if (authDto.getPassword() != null) {
             var hashedPassword = passwordService.encode(authDto.getPassword());
@@ -92,14 +93,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception {
-        var userAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider().toString());
+        var userAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider()
+                .toString());
+        if (userAccount.getUser() == null) {
+            throw new Exception("user not found");
+        }
         if (userAccount.getAccount() == null) {
             throw new Exception("user account not found");
         }
-        if (userAccount.getAccount().getPassword_hash() == null) {
+        if (userAccount.getAccount()
+                .getPassword_hash() == null) {
             throw new Exception("password not found");
         }
-        if (!passwordService.matches(authDto.getPassword(), userAccount.getAccount().getPassword_hash())) {
+        if (!passwordService.matches(authDto.getPassword(), userAccount.getAccount()
+                .getPassword_hash())) {
             throw new Exception("invalid password");
         }
         return generateToken(userAccount.getUser());
@@ -107,7 +114,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception {
-        var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider().toString());
+        var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider()
+                .toString());
         if (existingUserAccount.getUser() != null) {
             throw new Exception("user already exists");
         }
