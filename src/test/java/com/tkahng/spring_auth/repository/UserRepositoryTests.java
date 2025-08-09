@@ -1,6 +1,5 @@
 package com.tkahng.spring_auth.repository;
 
-import com.tkahng.spring_auth.TestDataUtil;
 import com.tkahng.spring_auth.domain.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,11 +44,15 @@ public class UserRepositoryTests {
 
     @Test
     public void testThatMultipleUsersCanBeCreatedAndRecalled() {
-        User userA = TestDataUtil.createTestAuthor();
-        userA.setEmail("emaila");
+        User userA = User.builder()
+                .name("namea")
+                .email("emaila")
+                .build();
         underTest.save(userA);
-        User useB = TestDataUtil.createTestAuthor();
-        useB.setEmail("emailb");
+        User useB = User.builder()
+                .name("nameb")
+                .email("emailb")
+                .build();
         underTest.save(useB);
         Iterable<User> result = underTest.findAll();
         assertThat(result)

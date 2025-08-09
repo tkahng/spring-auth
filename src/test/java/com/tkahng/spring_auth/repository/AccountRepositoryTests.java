@@ -1,6 +1,5 @@
 package com.tkahng.spring_auth.repository;
 
-import com.tkahng.spring_auth.TestDataUtil;
 import com.tkahng.spring_auth.domain.Account;
 import com.tkahng.spring_auth.domain.User;
 import org.junit.jupiter.api.Test;
@@ -108,9 +107,11 @@ public class AccountRepositoryTests {
 
     @Test
     public void testThatAccountCanBeDeleted() {
-        User user = TestDataUtil.createTestAuthor();
-        user.setName("name5");
-        user.setEmail("email5");
+        User user = User.builder()
+                .email("email5")
+                .name("name5")
+                .build();
+
         userRepository.save(user);
         Account account = new Account();
         account.setUser(user);

@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Configuration
@@ -28,12 +29,37 @@ import java.util.Base64;
 public class SecurityConfig {
 
     @Value("${jwt.key}")
-    private String jwtKeyBase64;
+    private String jwtKey;
 
     @Bean
     public SecretKey secretKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(this.jwtKeyBase64);
+        var newkey = "VGhpcy1rZXktaXMtbG9uZyBlbm91Z2ggdG8tdXNlLWZvciBoczI1Ng==";
+        byte[] keyBytes;
+        try {
+            keyBytes = Base64.getDecoder()
+                    .decode(newkey);
+        } catch (IllegalArgumentException ex) {
+            keyBytes = newkey.getBytes(StandardCharsets.UTF_8);
+        }
+
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException(
+                    "HMAC key must be at least 256 bits (32 bytes). Current length: " + keyBytes.length + " bytes"
+            );
+        }
+
         return new SecretKeySpec(keyBytes, "HmacSHA256");
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(SecretKey secretKey) {
+        return NimbusJwtDecoder.withSecretKey(secretKey)
+                .build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder(SecretKey secretKey) {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey.getEncoded()));
     }
 
     @Bean
@@ -41,15 +67,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder(SecretKey secretKey) {
-        return NimbusJwtDecoder.withSecretKey(secretKey).build();
-    }
-
-    @Bean
-    public JwtEncoder jwtEncoder(SecretKey secretKey) {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -61,8 +78,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/public/**")
+                        .permitAll()
+                        .anyRequest()
+                        .permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())
