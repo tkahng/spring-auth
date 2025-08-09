@@ -23,6 +23,8 @@ public interface AuthService {
 
     UserAccount createUserAccount(@NotNull AuthDto authDto);
 
+    AuthenticationResponse generateToken(@NotNull User user) throws Exception;
+
     AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception;
 
     AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception;

@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class AuthServiceTests {
+class AuthServiceIntegrationTests {
     @Autowired
     private Flyway flyway;
 
