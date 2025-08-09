@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Optional<Account> findAccountByUserIdAndProviderId(String userId, String providerId) {
+    public Optional<Account> findAccountByUserIdAndProviderId(UUID userId, String providerId) {
         return accountRepository.findByUserIdAndProviderId(userId, providerId);
     }
 
@@ -68,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
         account.setAccountId(authDto.getAccountId());
         if (authDto.getPassword() != null) {
             var hashedPassword = passwordService.encode(authDto.getPassword());
-            account.setPassword(hashedPassword);
+            account.setPassword_hash(hashedPassword);
         }
         return accountRepository.save(account);
     }
@@ -95,10 +96,10 @@ public class AuthServiceImpl implements AuthService {
         if (userAccount.getAccount() == null) {
             throw new Exception("user account not found");
         }
-        if (userAccount.getAccount().getPassword() == null) {
+        if (userAccount.getAccount().getPassword_hash() == null) {
             throw new Exception("password not found");
         }
-        if (!passwordService.matches(authDto.getPassword(), userAccount.getAccount().getPassword())) {
+        if (!passwordService.matches(authDto.getPassword(), userAccount.getAccount().getPassword_hash())) {
             throw new Exception("invalid password");
         }
         return generateToken(userAccount.getUser());

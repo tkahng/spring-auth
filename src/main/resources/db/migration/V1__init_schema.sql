@@ -71,7 +71,7 @@ create table if not exists public.tokens (
 CREATE TRIGGER handle_tokens_updated_at before
 update on public.tokens for each row execute procedure set_current_timestamp_updated_at();
 -- -------------- USER ACCOUNTS TABLE START -----------------------------------------------------------------------
-create table if not exists public.user_accounts (
+create table if not exists public.accounts (
     id uuid primary key default gen_random_uuid(),
     "user_id" uuid not null references public.users on delete cascade on update cascade,
     provider_id text not null,
@@ -93,17 +93,17 @@ create table if not exists public.user_accounts (
     created_at timestamptz default now(),
     updated_at timestamptz default now(),
     -- compound unique constraint on user_id and provider
-    -- constraint user_accounts_type_identifier_token_not_empty check (
+    -- constraint accounts_type_identifier_token_not_empty check (
     --     char_length(type) > 0
     --     and char_length(identifier) > 0
     --     and char_length(token) > 0
     -- ),
-    -- constraint user_accounts_user_id_type_provider_account_id_not_empty check ("user_id", type, provider, "provider_account_id"),
-    constraint user_accounts_provider_provider_account_id_unique unique (provider_id, account_id),
-    constraint user_accounts_user_id_provider_unique unique ("user_id", provider_id)
+    -- constraint accounts_user_id_type_provider_account_id_not_empty check ("user_id", type, provider, "provider_account_id"),
+    constraint accounts_provider_provider_account_id_unique unique (provider_id, account_id),
+    constraint accounts_user_id_provider_unique unique ("user_id", provider_id)
 );
-CREATE TRIGGER handle_user_accounts_updated_at before
-update on public.user_accounts for each row execute procedure set_current_timestamp_updated_at();
+CREATE TRIGGER handle_accounts_updated_at before
+update on public.accounts for each row execute procedure set_current_timestamp_updated_at();
 -- -------------- USER SESSIONS TABLE START -----------------------------------------------------------------------
 create table if not exists public.user_sessions (
     id uuid primary key default gen_random_uuid(),

@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, String> {
-    Optional<Account> findByUserIdAndProviderId(String userId, String providerId);
+public interface AccountRepository extends JpaRepository<Account, UUID> {
+    Optional<Account> findByUserIdAndProviderId(UUID userId, String providerId);
 }

@@ -13,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Data
@@ -34,30 +35,33 @@ public class Account {
     @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "UUID")
-    private String id;
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false)
-    private String accountId;
-    @Column(nullable = false)
     private String providerId;
+    @Column(nullable = false)
+    private String accountId;
     @Column(nullable = true)
-    private String accessToken;
+    private String password_hash;
     @Column(nullable = true)
     private String refreshToken;
     @Column(nullable = true)
-    private String accessTokenExpiresAt;
+    private String accessToken;
     @Column(nullable = true)
-    private String refreshTokenExpiresAt;
-    @Column(nullable = true)
-    private String scope;
+    private Long expiresAt;
     @Column(nullable = true)
     private String idToken;
     @Column(nullable = true)
-    private String password;
+    private String scope;
+    @Column(nullable = true)
+    private String sessionState;
+    @Column(nullable = true)
+    private String tokenType;
+
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

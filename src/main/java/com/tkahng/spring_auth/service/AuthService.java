@@ -8,11 +8,12 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface AuthService {
     Optional<User> findUserByEmail(String email);
 
-    Optional<Account> findAccountByUserIdAndProviderId(String userId, String providerId);
+    Optional<Account> findAccountByUserIdAndProviderId(UUID userId, String providerId);
 
     UserAccount findUserAccountByEmailAndProviderId(String email, String providerId);
 

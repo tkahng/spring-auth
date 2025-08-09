@@ -21,6 +21,6 @@ public class CustomUserDetailService implements UserDetailsService {
         if (userDetails == null || userDetails.getAccount() == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return new CustomUserDetail(userDetails.getUser().getEmail(), userDetails.getAccount().getPassword());
+        return new CustomUserDetail(userDetails.getUser().getEmail(), userDetails.getAccount().getPassword_hash());
     }
 }
