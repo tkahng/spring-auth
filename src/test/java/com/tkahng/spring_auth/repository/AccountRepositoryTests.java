@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataJpaTest(showSql = true)
 @EnableJpaAuditing
 @ExtendWith(SpringExtension.class)
 public class AccountRepositoryTests {
@@ -29,20 +29,22 @@ public class AccountRepositoryTests {
 
     @Test
     public void testThatAccountCanBeCreatedAndRecalled() {
-        User user = new User();
-        user.setName("name2");
-        user.setEmail("email2");
+        User user = User.builder()
+                .name("name2")
+                .email("email2")
+                .build();
+
         userRepository.save(user);
-        User managedUser = userRepository.findById(user.getId()).orElseThrow();
-        Account account = new Account();
-        account.setUser(managedUser);
-        account.setAccountId("accountId1");
-        account.setProviderId("providerId1");
+        Account account = Account.builder()
+                .user(user)
+                .accountId("accountId1")
+                .providerId("providerId1")
+                .build();
+
         underTest.save(account);
         Optional<Account> result = underTest.findById(account.getId());
         assertThat(result).isPresent();
         var resultAccount = result.get();
-        resultAccount.setUser(managedUser);
         assertThat(resultAccount).isEqualTo(account);
     }
 
@@ -52,19 +54,17 @@ public class AccountRepositoryTests {
         user.setName("name3");
         user.setEmail("email3");
         userRepository.save(user);
-        User managedUser = userRepository.findById(user.getId()).orElseThrow();
         Account accountA = new Account();
-        accountA.setUser(managedUser);
+        accountA.setUser(user);
         accountA.setAccountId("accountId2A");
         accountA.setProviderId("providerId2A");
         underTest.save(accountA);
         Account accountB = new Account();
-        accountB.setUser(managedUser);
+        accountB.setUser(user);
         accountB.setAccountId("accountId2B");
         accountB.setProviderId("providerId2B");
         underTest.save(accountB);
         Iterable<Account> result = underTest.findAll();
-        result.forEach(account -> account.setUser(managedUser));
         assertThat(result)
                 .hasSize(2)
                 .containsExactly(accountA, accountB);
@@ -72,25 +72,48 @@ public class AccountRepositoryTests {
 
     @Test
     public void testThatAccountsWithSameProviderIdCannotBeCreated() {
-        User user = TestDataUtil.createTestAuthor();
-        user.setName("name4");
-        user.setEmail("email4");
+        User user = User.builder()
+                .email("email4")
+                .name("name4")
+                .build();
+
         userRepository.save(user);
-        User managedUser = userRepository.findById(user.getId()).orElseThrow();
-        Account accountA = new Account();
-        accountA.setUser(managedUser);
-        accountA.setAccountId("accountId3A");
-        accountA.setProviderId("providerId3A");
+        Account accountA = Account
+                .builder()
+                .user(user)
+                .accountId("accountId3A")
+                .providerId("providerId3A")
+                .build();
+
         underTest.save(accountA);
-        Account accountB = new Account();
-        accountB.setUser(managedUser);
-        accountB.setAccountId("accountId3B");
-        accountB.setProviderId("providerId3A");
+        Account accountB = Account.builder()
+                .user(user)
+                .accountId("accountId3B")
+                .providerId("providerId3A")
+                .build();
+//
         try {
             underTest.save(accountB);
         } catch (Exception e) {
             assertThat(e.getMessage()).contains("Unique index or primary key violation");
         }
-
     }
+
+    @Test
+    public void testThatAccountCanBeDeleted() {
+        User user = TestDataUtil.createTestAuthor();
+        user.setName("name5");
+        user.setEmail("email5");
+        userRepository.save(user);
+        Account account = new Account();
+        account.setUser(user);
+        account.setAccountId("accountId4");
+        account.setProviderId("providerId4");
+        underTest.save(account);
+        underTest.delete(account);
+        Optional<Account> result = underTest.findById(account.getId());
+        assertThat(result).isEmpty();
+    }
+
+
 }

@@ -29,12 +29,10 @@ public class UserRepositoryTests {
         User user = new User();
         user.setName("name1");
         user.setEmail("email1");
-        user.setAccounts(new java.util.ArrayList<>());
         underTest.save(user);
         Optional<User> result = underTest.findById(user.getId());
         assertThat(result).isPresent();
         var resultUser = result.get();
-        resultUser.setAccounts(new java.util.ArrayList<>());
         assertThat(resultUser).isEqualTo(user);
     }
 
@@ -42,14 +40,11 @@ public class UserRepositoryTests {
     public void testThatMultipleUsersCanBeCreatedAndRecalled() {
         User userA = TestDataUtil.createTestAuthor();
         userA.setEmail("emaila");
-        userA.setAccounts(new java.util.ArrayList<>());
         underTest.save(userA);
         User useB = TestDataUtil.createTestAuthor();
         useB.setEmail("emailb");
-        useB.setAccounts(new java.util.ArrayList<>());
         underTest.save(useB);
         Iterable<User> result = underTest.findAll();
-        result.forEach(user -> user.setAccounts(new java.util.ArrayList<>()));
         assertThat(result)
                 .hasSize(2)
                 .containsExactly(userA, useB);
