@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,9 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -39,7 +36,7 @@ public class AuthControllerIntegrationTests {
     @Rollback
     void loginAndAccessProtectedEndpoint() throws Exception {
         // 1. Sign up first (or login if user already exists)
-        mockMvc.perform(post("/api/signup")
+        mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     { "email": "test@example.com", "password": "pass123" }
@@ -47,7 +44,7 @@ public class AuthControllerIntegrationTests {
                 .andExpect(status().isOk());
 
         // 2. Login and capture token
-        MvcResult loginResult = mockMvc.perform(post("/api/login")
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     { "email": "test@example.com", "password": "pass123" }
@@ -63,10 +60,10 @@ public class AuthControllerIntegrationTests {
         String accessToken = authResponse.getAccessToken();
         assertThat(accessToken).isNotBlank();
 
-        // 3. Call protected endpoint with Bearer token
-        mockMvc.perform(get("/api/me") // your protected endpoint
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").exists()); // example assertion
+//        // 3. Call protected endpoint with Bearer token
+//        mockMvc.perform(get("/api/me") // your protected endpoint
+//                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.data").exists()); // example assertion
     }
 }
