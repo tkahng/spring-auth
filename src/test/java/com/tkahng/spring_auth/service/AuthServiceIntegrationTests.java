@@ -60,5 +60,6 @@ class AuthServiceIntegrationTests {
         assertThat(user).isNotNull()
                 .matches(user1 -> user.getEmail()
                         .equals("email"));
+        
     }
 }

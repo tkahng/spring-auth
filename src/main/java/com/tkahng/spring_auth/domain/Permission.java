@@ -11,43 +11,28 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "permissions")
+public class Permission {
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    Set<Role> roles;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = true)
+    @Column(nullable = false, unique = true, columnDefinition = "text")
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = true)
-    private OffsetDateTime emailVerifiedAt;
-
-    @Column(nullable = true)
-    private String image;
+    @Column(nullable = true, columnDefinition = "text")
+    private String description;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
@@ -58,7 +43,7 @@ public class User {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
-    
-    @OneToMany(mappedBy = "user")
-    private List<Account> accounts = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "permissions")
+    private Set<Role> roles;
 }
