@@ -64,7 +64,7 @@ public class AuthControllerIntegrationTests {
         assertThat(accessToken).isNotBlank();
 
         // 3. Call protected endpoint with Bearer token
-        mockMvc.perform(get("/api/protected") // your protected endpoint
+        mockMvc.perform(get("/api/me") // your protected endpoint
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists()); // example assertion
