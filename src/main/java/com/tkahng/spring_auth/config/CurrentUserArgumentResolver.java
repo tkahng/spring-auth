@@ -1,12 +1,15 @@
 package com.tkahng.spring_auth.config;
 
 
-import com.tkahng.spring_auth.annotation.CurrentUser;
-import com.tkahng.spring_auth.domain.CustomUserDetail;
+import com.tkahng.spring_auth.domain.User;
+import com.tkahng.spring_auth.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -14,24 +17,32 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
+
+    private final AuthService authService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(CurrentUser.class) != null
-                && CustomUserDetail.class.isAssignableFrom(parameter.getParameterType());
+        var type = parameter.getParameterType()
+                .equals(User.class);
+        log.info("type: {}", type);
+        return type;
     }
 
     @Override
     public Object resolveArgument(
-            MethodParameter parameter, ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-
-        Authentication auth = SecurityContextHolder.getContext()
+            @NotNull MethodParameter parameter, ModelAndViewContainer mavContainer,
+            @NotNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+        var authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof CustomUserDetail user) {
-            return user;
+        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            Jwt jwt = jwtAuth.getToken();
+            String subject = jwt.getSubject();
+            return authService.findUserByEmail(subject)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
         }
-        throw new AccessDeniedException("Not authenticated");
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package com.tkahng.spring_auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
+import com.tkahng.spring_auth.dto.UserDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -64,9 +64,14 @@ public class AuthControllerIntegrationTests {
         assertThat(accessToken).isNotBlank();
 
         // 3. Call protected endpoint with Bearer token
-        mockMvc.perform(get("/api/auth/me") // your protected endpoint
+        var result = mockMvc.perform(get("/api/auth/me") // your protected endpoint
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").exists()); // example assertion
+                .andReturn();
+        String json = result.getResponse()
+                .getContentAsString();
+        UserDto article = objectMapper.readValue(json, UserDto.class);
+        assertThat(article).isNotNull();
+        assertThat(article.getEmail()).isEqualTo("test@example.com");
     }
 }

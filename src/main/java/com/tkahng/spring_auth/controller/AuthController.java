@@ -2,10 +2,11 @@ package com.tkahng.spring_auth.controller;
 
 
 import com.tkahng.spring_auth.annotation.AuthenticatedUserRequired;
+import com.tkahng.spring_auth.annotation.CurrentUser;
+import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.*;
 import com.tkahng.spring_auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,9 +40,9 @@ public class AuthController {
 
     @GetMapping("/me")
     @AuthenticatedUserRequired
-    public UserDto me(@AuthenticationPrincipal(expression = "claims['sub']") String subject) {
+    public UserDto me(@CurrentUser User user) {
         return UserDto.builder()
-                .email(subject)
+                .email(user.getEmail())
                 .build();
     }
 }
