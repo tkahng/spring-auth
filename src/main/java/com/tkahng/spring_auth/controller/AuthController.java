@@ -1,13 +1,13 @@
 package com.tkahng.spring_auth.controller;
 
 
+import com.tkahng.spring_auth.annotation.AuthenticatedUserRequired;
+import com.tkahng.spring_auth.annotation.CurrentUser;
+import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.*;
 import com.tkahng.spring_auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,14 +38,14 @@ public class AuthController {
         return authService.login(authDto);
     }
 
-//    @GetMapping("/me")
-//    @AuthenticatedUserRequired
-//    public UserDto me(@CurrentUser User user) {
-//        return UserDto.builder()
-//                .email(user.getEmail())
-//                .build();
-//    }
-//
+    @GetMapping("/me")
+    @AuthenticatedUserRequired
+    public UserDto me(@CurrentUser User user) {
+        return UserDto.builder()
+                .email(user.getEmail())
+                .build();
+    }
+
 //    @PostMapping("/refresh-token")
 //    public AuthenticationResponse refreshToken(@RequestBody RefreshTokenRequest request) throws Exception {
 ////        var

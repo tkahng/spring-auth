@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "roles")
