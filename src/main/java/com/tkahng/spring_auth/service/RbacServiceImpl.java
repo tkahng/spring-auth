@@ -55,6 +55,10 @@ public class RbacServiceImpl implements RbacService {
     @Override
     public void assignRoleToUser(User user, Role role) {
         UserRole userRole = new UserRole();
+        userRole.setId(UserRoleId.builder()
+                .userId(user.getId())
+                .roleId(role.getId())
+                .build());
         userRole.setUser(user);
         userRole.setRole(role);
         userRoleRepository.saveAndFlush(userRole);

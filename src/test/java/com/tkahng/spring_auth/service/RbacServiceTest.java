@@ -124,7 +124,7 @@ class RbacServiceTest {
     @Test
     @Rollback
     void assignRoleToUser() {
-        var user = userRepository.save(User.builder()
+        var user = userRepository.saveAndFlush(User.builder()
                 .name("test")
                 .email("test")
                 .build());
