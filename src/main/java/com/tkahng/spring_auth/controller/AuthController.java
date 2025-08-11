@@ -1,13 +1,13 @@
 package com.tkahng.spring_auth.controller;
 
 
+import com.tkahng.spring_auth.annotation.AuthenticatedUserRequired;
+import com.tkahng.spring_auth.annotation.CurrentUser;
+import com.tkahng.spring_auth.domain.CustomUserDetail;
 import com.tkahng.spring_auth.dto.*;
 import com.tkahng.spring_auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +36,13 @@ public class AuthController {
                 .accountId(request.getEmail())
                 .build();
         return authService.login(authDto);
+    }
+
+    @GetMapping
+    @AuthenticatedUserRequired
+    public UserDto me(@CurrentUser CustomUserDetail user) {
+        return UserDto.builder()
+                .email(user.getUsername())
+                .build();
     }
 }

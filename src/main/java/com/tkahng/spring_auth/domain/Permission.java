@@ -11,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -22,8 +21,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "permissions")
 public class Permission {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -43,7 +40,4 @@ public class Permission {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
-
-    @ManyToMany(mappedBy = "permissions")
-    private Set<Role> roles;
 }

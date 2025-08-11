@@ -11,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -22,16 +21,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "roles")
 public class Role {
-    @ManyToMany
-    @JoinTable(
-            name = "role_permissions",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    Set<Permission> permissions;
-
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
-    
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

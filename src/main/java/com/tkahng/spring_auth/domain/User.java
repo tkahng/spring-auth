@@ -12,9 +12,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -25,14 +22,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 public class User {
-
-    @ManyToMany
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    Set<Role> roles;
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -58,7 +48,7 @@ public class User {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
-    
-    @OneToMany(mappedBy = "user")
-    private List<Account> accounts = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "user")
+//    private List<Account> accounts = new ArrayList<>();
 }
