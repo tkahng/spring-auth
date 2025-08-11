@@ -1,8 +1,11 @@
 package com.tkahng.spring_auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tkahng.spring_auth.dto.AuthDto;
+import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
+import com.tkahng.spring_auth.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureMockMvc
 public class AuthControllerIntegrationTests {
+    @Autowired
+    private AuthService authService;
     @Autowired
     private MockMvc mockMvc;
 
@@ -73,5 +78,24 @@ public class AuthControllerIntegrationTests {
         UserDto article = objectMapper.readValue(json, UserDto.class);
         assertThat(article).isNotNull();
         assertThat(article.getEmail()).isEqualTo("test@example.com");
+    }
+
+    @Test
+    @Rollback
+    public void refreshToken() throws Exception {
+        // 1. Sign up first (or login if user already exists)
+        var user = authService.createUser(AuthDto.builder()
+                .email("test@example.com")
+                .provider(AuthProvider.CREDENTIALS)
+                .accountId("test@example.com")
+                .build());
+        var authResponse = authService.generateToken(user);
+        assertThat(authResponse).isNotNull();
+        mockMvc.perform(post("/api/auth/refresh-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                    { "refreshToken": "%s" }
+                                """.formatted(authResponse.getRefreshToken())))
+                .andExpect(status().isOk());
     }
 }

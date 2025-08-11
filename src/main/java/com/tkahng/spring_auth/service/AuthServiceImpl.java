@@ -129,4 +129,12 @@ public class AuthServiceImpl implements AuthService {
         return generateToken(userAccount.getUser());
     }
 
+    @Override
+    public AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception {
+        var identifier = refreshTokenService.validateRefreshToken(refreshToken);
+        var user = findUserByEmail(identifier)
+                .orElseThrow(() -> new Exception("user not found"));
+        return generateToken(user);
+    }
+
 }

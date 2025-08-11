@@ -28,7 +28,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public String generateRefreshToken(CreateTokenDto createTokenDto) {
+    public String generateRefreshToken(@NotNull CreateTokenDto createTokenDto) {
         var token = tokenRepository.save(Token.builder()
                 .identifier(createTokenDto.getIdentifier())
                 .value(createTokenDto.getValue())

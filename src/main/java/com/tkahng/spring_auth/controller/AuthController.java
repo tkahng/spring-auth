@@ -7,6 +7,7 @@ import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.*;
 import com.tkahng.spring_auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,7 +17,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public AuthenticationResponse signup(@RequestBody RegisterRequest request) throws Exception {
+    public AuthenticationResponse signup(@RequestBody @NotNull RegisterRequest request) throws Exception {
         var authDto = AuthDto.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
@@ -28,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@RequestBody LoginRequest request) throws Exception {
+    public AuthenticationResponse login(@RequestBody @NotNull LoginRequest request) throws Exception {
         var authDto = AuthDto.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
@@ -46,8 +47,8 @@ public class AuthController {
                 .build();
     }
 
-//    @PostMapping("/refresh-token")
-//    public AuthenticationResponse refreshToken(@RequestBody RefreshTokenRequest request) throws Exception {
-////        var
-//    }
+    @PostMapping("/refresh-token")
+    public AuthenticationResponse refreshToken(@RequestBody @NotNull RefreshTokenRequest request) throws Exception {
+        return authService.handleRefreshToken(request.getRefreshToken());
+    }
 }

@@ -28,4 +28,6 @@ public interface AuthService {
     AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception;
 
     AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception;
+
+    AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception;
 }
