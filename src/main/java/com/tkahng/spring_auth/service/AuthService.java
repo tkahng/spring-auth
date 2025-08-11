@@ -21,7 +21,7 @@ public interface AuthService {
 
     Account createAccount(@NotNull AuthDto authDto, User user);
 
-    UserAccount createUserAccount(@NotNull AuthDto authDto);
+    UserAccount createUserAndAccount(@NotNull AuthDto authDto);
 
     AuthenticationResponse generateToken(@NotNull User user) throws Exception;
 

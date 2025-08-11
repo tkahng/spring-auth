@@ -3,8 +3,12 @@ package com.tkahng.spring_auth.service;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.CreatePermissionDto;
 import com.tkahng.spring_auth.dto.CreateRoleDto;
+import com.tkahng.spring_auth.repository.PermissionRepository;
+import com.tkahng.spring_auth.repository.RoleRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +24,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @Transactional
 @ExtendWith(SpringExtension.class)
+@Slf4j
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RbacServiceTest {
     @Autowired
     private RbacService rbacService;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -35,6 +46,7 @@ class RbacServiceTest {
     @AfterEach
     void tearDown() {
     }
+
 
     @Test
     @Rollback
@@ -57,24 +69,60 @@ class RbacServiceTest {
 
     @Test
     @Rollback
+    void testCreatePermissionNoName() {
+        var dto = CreatePermissionDto.builder()
+                .description("test")
+                .build();
+
+        Assertions.assertThrows(Exception.class, () -> {
+            rbacService.createPermission(dto);
+        });
+    }
+
+    @Test
+    @Rollback
     void createRole() {
+        // create
         var dto = CreateRoleDto.builder()
                 .name("test")
                 .description("test")
                 .build();
         var result = rbacService.createRole(dto);
         assertThat(result).isNotNull();
+        // find by name
         var findResult = rbacService.findRoleByName("test")
                 .orElseThrow();
         assertThat(findResult).isNotNull()
                 .isEqualTo(result);
+        // find by id
         var findResult2 = rbacService.findRoleById(result.getId())
                 .orElseThrow();
         assertThat(findResult2).isNotNull()
                 .isEqualTo(result);
+        // create without description
+        var dtoWithoutDescription = CreateRoleDto.builder()
+                .name("test2")
+                .build();
+        var result2 = rbacService.createRole(dtoWithoutDescription);
+        assertThat(result2).isNotNull();
+        assertThat(result2.getName()).isEqualTo("test2");
+        assertThat(result2.getDescription()).isEqualTo(null);
     }
 
     @Test
+    @Rollback
+    void testCreateRoleNoName() {
+        var dto = CreateRoleDto.builder()
+                .description("test")
+                .build();
+
+        Assertions.assertThrows(Exception.class, () -> {
+            rbacService.createRole(dto);
+        });
+    }
+
+    @Test
+    @Rollback
     void assignRoleToUser() {
         var user = userRepository.save(User.builder()
                 .name("test")

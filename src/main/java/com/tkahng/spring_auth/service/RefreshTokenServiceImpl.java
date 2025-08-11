@@ -15,7 +15,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final TokenRepository tokenRepository;
 
     public void saveToken(@NotNull CreateTokenDto createTokenDto) {
-        tokenRepository.save(Token.builder()
+        tokenRepository.saveAndFlush(Token.builder()
                 .identifier(createTokenDto.getIdentifier())
                 .value(createTokenDto.getValue())
                 .expires(OffsetDateTime.now()
@@ -29,7 +29,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public String generateRefreshToken(@NotNull CreateTokenDto createTokenDto) {
-        var token = tokenRepository.save(Token.builder()
+        var token = tokenRepository.saveAndFlush(Token.builder()
                 .identifier(createTokenDto.getIdentifier())
                 .value(createTokenDto.getValue())
                 .expires(OffsetDateTime.now()

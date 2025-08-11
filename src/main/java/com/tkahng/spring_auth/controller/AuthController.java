@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth.controller;
 
 
-import com.tkahng.spring_auth.annotation.AuthenticatedUserRequired;
+import com.tkahng.spring_auth.annotation.Authenticated;
 import com.tkahng.spring_auth.annotation.CurrentUser;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.*;
@@ -40,7 +40,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    @AuthenticatedUserRequired
+    @Authenticated
     public UserDto me(@CurrentUser User user) {
         return UserDto.builder()
                 .email(user.getEmail())

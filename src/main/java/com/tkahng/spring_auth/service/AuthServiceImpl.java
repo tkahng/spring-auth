@@ -58,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
         var user = new User();
         user.setEmail(authDto.getEmail());
         user.setName(authDto.getName());
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user);
     }
 
 
@@ -73,11 +73,11 @@ public class AuthServiceImpl implements AuthService {
             var hashedPassword = passwordService.encode(authDto.getPassword());
             account.setPassword_hash(hashedPassword);
         }
-        return accountRepository.save(account);
+        return accountRepository.saveAndFlush(account);
     }
 
     @Override
-    public UserAccount createUserAccount(@NotNull AuthDto authDto) {
+    public UserAccount createUserAndAccount(@NotNull AuthDto authDto) {
         var userAccount = new UserAccount();
         var user = createUser(authDto);
         userAccount.setUser(user);
@@ -125,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
         if (existingUserAccount.getUser() != null) {
             throw new Exception("user already exists");
         }
-        var userAccount = createUserAccount(authDto);
+        var userAccount = createUserAndAccount(authDto);
         return generateToken(userAccount.getUser());
     }
 

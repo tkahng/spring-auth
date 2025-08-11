@@ -15,7 +15,7 @@ public class TokenServiceImpl {
     private final TokenRepository tokenRepository;
 
     public void saveToken(@NotNull CreateTokenDto createTokenDto) {
-        tokenRepository.save(Token.builder()
+        tokenRepository.saveAndFlush(Token.builder()
                 .identifier(createTokenDto.getIdentifier())
                 .value(createTokenDto.getValue())
                 .expires(OffsetDateTime.now()
