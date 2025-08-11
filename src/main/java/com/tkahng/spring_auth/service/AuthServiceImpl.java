@@ -5,6 +5,7 @@ import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
+import com.tkahng.spring_auth.dto.CreateTokenDto;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -87,7 +88,12 @@ public class AuthServiceImpl implements AuthService {
 
     public AuthenticationResponse generateToken(@NotNull User user) throws Exception {
         var accessToken = jwtService.generateToken(user.getEmail());
-        var refreshToken = refreshTokenService.generateRefreshToken(user.getEmail());
+        var token = UUID.randomUUID()
+                .toString();
+        var refreshToken = refreshTokenService.generateRefreshToken(CreateTokenDto.builder()
+                .value(token)
+                .identifier(user.getEmail())
+                .build());
         return new AuthenticationResponse(accessToken, refreshToken);
     }
 

@@ -1,7 +1,9 @@
 package com.tkahng.spring_auth.service;
 
-public interface RefreshTokenService {
-    String generateRefreshToken(String username);
+import com.tkahng.spring_auth.dto.CreateTokenDto;
 
-    String validateRefreshToken(String refreshToken);
+public interface RefreshTokenService {
+    String generateRefreshToken(CreateTokenDto createTokenDto);
+
+    String validateRefreshToken(String refreshToken) throws Exception;
 }

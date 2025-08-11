@@ -20,24 +20,20 @@ import java.util.UUID;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "users")
-public class User {
-
+@Table(name = "tokens")
+public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = true)
-    private String name;
+    @Column(nullable = false, unique = false, columnDefinition = "text")
+    private String identifier;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private OffsetDateTime expires;
 
-    @Column(nullable = true)
-    private OffsetDateTime emailVerifiedAt;
-
-    @Column(nullable = true)
-    private String image;
+    @Column(nullable = false, unique = true, columnDefinition = "text")
+    private String value;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
@@ -48,5 +44,4 @@ public class User {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
-    
 }
