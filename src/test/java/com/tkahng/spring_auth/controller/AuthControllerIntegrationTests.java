@@ -67,6 +67,6 @@ public class AuthControllerIntegrationTests {
         mockMvc.perform(get("/api/auth/me") // your protected endpoint
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(ˆ)); // example assertion
+                .andExpect(jsonPath("$.email").exists()); // example assertion
     }
 }
