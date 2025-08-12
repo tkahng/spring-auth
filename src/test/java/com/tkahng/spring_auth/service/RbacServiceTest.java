@@ -155,4 +155,26 @@ class RbacServiceTest {
     @Test
     void findPermissionByName() {
     }
+
+    @Test
+    void notAssignedToRole() {
+    }
+
+    @Test
+    void findOrCreateRoleByName() {
+    }
+
+    @Test
+    void findAllRoles() {
+    }
+
+    @Test
+    void findOrCreatePermissionByName() {
+    }
+
+    @Test
+    void initRolesAndPermissions() {
+        rbacService.initRolesAndPermissions();
+
+    }
 }

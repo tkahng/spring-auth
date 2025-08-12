@@ -3,6 +3,7 @@ package com.tkahng.spring_auth.service;
 import com.tkahng.spring_auth.domain.*;
 import com.tkahng.spring_auth.dto.CreatePermissionDto;
 import com.tkahng.spring_auth.dto.CreateRoleDto;
+import com.tkahng.spring_auth.dto.PermissionFilter;
 import com.tkahng.spring_auth.dto.RoleFilter;
 import com.tkahng.spring_auth.repository.PermissionRepository;
 import com.tkahng.spring_auth.repository.RolePermissionRepository;
@@ -118,7 +119,7 @@ public class RbacServiceImpl implements RbacService {
         return role;
     }
 
-    private Specification<Role> filter(RoleFilter filter) {
+    private Specification<Role> filterRoles(RoleFilter filter) {
         return (root, query, cb) -> {
             var predicates = cb.conjunction();
 
@@ -153,7 +154,7 @@ public class RbacServiceImpl implements RbacService {
 
     @Override
     public Page<Role> findAllRoles(RoleFilter filter, Pageable pageable) {
-        return roleRepository.findAll(filter(filter), pageable);
+        return roleRepository.findAll(filterRoles(filter), pageable);
     }
 
     @Override
@@ -168,7 +169,52 @@ public class RbacServiceImpl implements RbacService {
 
     @Override
     public Permission findOrCreatePermissionByName(String name) {
-        return null;
+        var permission = permissionRepository.findByName(name)
+                .orElse(null);
+        if (permission == null) {
+            permission = permissionRepository.saveAndFlush(Permission.builder()
+                    .name(name)
+                    .build());
+        }
+        return permission;
+    }
+
+    private Specification<Permission> filterPermission(PermissionFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter.getIds() != null && !filter.getIds()
+                    .isEmpty()) {
+                predicates.getExpressions()
+                        .add(root.get("id")
+                                .in(filter.getIds()));
+            }
+
+            if (filter.getName() != null && !filter.getName()
+                    .isBlank()) {
+                predicates.getExpressions()
+                        .add(
+                                cb.like(cb.lower(root.get("name")), "%" + filter.getName()
+                                        .toLowerCase() + "%")
+                        );
+            }
+
+            if (filter.getDescription() != null && !filter.getDescription()
+                    .isBlank()) {
+                predicates.getExpressions()
+                        .add(
+                                cb.like(cb.lower(root.get("description")), "%" + filter.getDescription()
+                                        .toLowerCase() + "%")
+                        );
+            }
+
+            return predicates;
+        };
+    }
+
+    @Override
+    public Page<Permission> findAllPermissions(PermissionFilter filter, Pageable pageable) {
+        return permissionRepository.findAll(filterPermission(filter), pageable);
     }
 
     @Override
@@ -177,9 +223,10 @@ public class RbacServiceImpl implements RbacService {
             String key = entry.getKey();
             List<String> values = entry.getValue();
 
-            System.out.println("Key: " + key);
+            var role = findOrCreateRoleByName(key);
             for (String value : values) {
-                System.out.println("  Value: " + value);
+                var permission = findOrCreatePermissionByName(value);
+                assignPermissionToRole(role, permission);
             }
         }
     }

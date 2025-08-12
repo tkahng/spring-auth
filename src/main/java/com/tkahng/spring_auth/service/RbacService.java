@@ -5,6 +5,7 @@ import com.tkahng.spring_auth.domain.Role;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.CreatePermissionDto;
 import com.tkahng.spring_auth.dto.CreateRoleDto;
+import com.tkahng.spring_auth.dto.PermissionFilter;
 import com.tkahng.spring_auth.dto.RoleFilter;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -34,6 +35,8 @@ public interface RbacService {
     Optional<Permission> findPermissionByName(String name);
 
     Permission findOrCreatePermissionByName(String name);
+
+    Page<Permission> findAllPermissions(PermissionFilter filter, Pageable pageable);
 
     void assignPermissionToRole(Role role, Permission permission);
 
