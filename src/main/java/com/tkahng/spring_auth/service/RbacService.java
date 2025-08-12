@@ -5,8 +5,11 @@ import com.tkahng.spring_auth.domain.Role;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.CreatePermissionDto;
 import com.tkahng.spring_auth.dto.CreateRoleDto;
+import com.tkahng.spring_auth.dto.RoleFilter;
 import jakarta.validation.Valid;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,9 +19,11 @@ public interface RbacService {
 
     Optional<Role> findRoleByName(String name);
 
+    Optional<Role> findRoleById(UUID id);
+
     Role findOrCreateRoleByName(String name);
 
-    Optional<Role> findRoleById(UUID id);
+    Page<Role> findAllRoles(RoleFilter filter, Pageable pageable);
 
     void assignRoleToUser(User user, Role role);
 

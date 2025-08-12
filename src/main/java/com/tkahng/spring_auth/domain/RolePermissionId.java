@@ -1,22 +1,23 @@
 package com.tkahng.spring_auth.domain;
 
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RolePermissionId implements Serializable {
-    private final UUID roleId;
-    private final UUID permissionId;
-
-    private RolePermissionId(UUID permissionId, UUID roleId) {
-        this.permissionId = permissionId;
-        this.roleId = roleId;
-    }
+    private UUID roleId;
+    private UUID permissionId;
 
     @Override
     public boolean equals(Object o) {

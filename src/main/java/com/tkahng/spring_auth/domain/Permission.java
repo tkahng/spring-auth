@@ -40,4 +40,6 @@ public class Permission {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
+
+    
 }
