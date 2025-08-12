@@ -48,15 +48,29 @@ public class RbacServiceImpl implements RbacService {
         return (root, query, cb) -> {
             // Subquery for role_permissions.permission_id
             Subquery<UUID> subquery = query.subquery(UUID.class);
-            Root<RolePermission> rpRoot = subquery.from(RolePermission.class);
-            subquery.select(rpRoot.get("id")
+            Root<RolePermission> rp = subquery.from(RolePermission.class);
+            subquery.select(rp.get("id")
                             .get("permissionId"))
-                    .where(cb.equal(rpRoot.get("id")
+                    .where(cb.equal(rp.get("id")
                             .get("roleId"), roleId));
 
             // p.id NOT IN (subquery)
             return cb.not(root.get("id")
                     .in(subquery));
+        };
+    }
+
+    public static Specification<Permission> belongsToRole(UUID roleId) {
+        return (root, query, cb) -> {
+            Subquery<UUID> subquery = query.subquery(UUID.class);
+            Root<RolePermission> rp = subquery.from(RolePermission.class);
+            subquery.select(rp.get("id")
+                            .get("permissionId"))
+                    .where(cb.equal(rp.get("id")
+                            .get("roleId"), roleId));
+
+            return root.get("id")
+                    .in(subquery);
         };
     }
 
