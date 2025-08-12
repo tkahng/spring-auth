@@ -30,7 +30,7 @@ public class UserRepositoryTests {
         User user = new User();
         user.setName("name1");
         user.setEmail("email1");
-        underTest.save(user);
+        underTest.saveAndFlush(user);
         Optional<User> result = underTest.findById(user.getId());
         assertThat(result).isPresent();
         var resultUser = result.get();
@@ -43,12 +43,12 @@ public class UserRepositoryTests {
                 .name("namea")
                 .email("emaila")
                 .build();
-        underTest.save(userA);
+        underTest.saveAndFlush(userA);
         User useB = User.builder()
                 .name("nameb")
                 .email("emailb")
                 .build();
-        underTest.save(useB);
+        underTest.saveAndFlush(useB);
         Iterable<User> result = underTest.findAll();
         assertThat(result)
                 .hasSize(2)

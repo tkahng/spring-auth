@@ -34,7 +34,7 @@ public class TokenRepositoryTests {
                 )
                 .value("value2")
                 .build();
-        var savedToken = tokenRepository.save(token);
+        var savedToken = tokenRepository.saveAndFlush(token);
         var retrievedToken = tokenRepository.findByValueAndExpiresAfter("value2", OffsetDateTime.now())
                 .orElse(null);
         assertThat(retrievedToken).isNull();
@@ -48,7 +48,7 @@ public class TokenRepositoryTests {
                         .plusDays(7))
                 .value("value")
                 .build();
-        var savedToken = tokenRepository.save(token);
+        var savedToken = tokenRepository.saveAndFlush(token);
         var retrievedToken = tokenRepository.findByValueAndExpiresAfter("value", OffsetDateTime.now())
                 .orElse(null);
         assertThat(retrievedToken).isNotNull();
@@ -62,7 +62,7 @@ public class TokenRepositoryTests {
                         .plusDays(7))
                 .value("value3")
                 .build();
-        tokenRepository.save(token);
+        tokenRepository.saveAndFlush(token);
         var retrievedToken = tokenRepository.findByValueAndExpiresAfter("value3", OffsetDateTime.now());
         assertThat(retrievedToken).isPresent();
         tokenRepository.deleteById(token.getId());

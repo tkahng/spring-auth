@@ -92,7 +92,7 @@ public class RbacServiceImpl implements RbacService {
         var role = roleRepository.findByName(name)
                 .orElse(null);
         if (role == null) {
-            role = roleRepository.save(Role.builder()
+            role = roleRepository.saveAndFlush(Role.builder()
                     .name(name)
                     .build());
         }
