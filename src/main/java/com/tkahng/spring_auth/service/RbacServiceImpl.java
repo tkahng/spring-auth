@@ -111,6 +111,10 @@ public class RbacServiceImpl implements RbacService {
 
     @Override
     public void assignPermissionToRole(Role role, Permission permission) {
+        var existingRolePermission = rolePermissionRepository.findByRoleIdAndPermissionId(role.getId(), permission.getId());
+        if (existingRolePermission.isPresent()) {
+            return;
+        }
         var rolePermission = RolePermission.builder()
                 .id(RolePermissionId.builder()
                         .roleId(role.getId())
