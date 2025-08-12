@@ -186,5 +186,25 @@ class RbacServiceTest {
                 .build(), Pageable.unpaged());
         assertThat(permissions).isNotNull();
         assertThat(permissions.getTotalElements()).isEqualTo(4);
+
+        var nameMap = rbacService.getRolePermissionMap();
+        for (var entry : nameMap.entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
+            var role = rbacService.findRoleByName(key)
+                    .orElseThrow();
+            log.info("role {}", role.getName());
+            assertThat(role).isNotNull();
+            var rolePermissions = rbacService.findAllPermissions(PermissionFilter.builder()
+                    .roleId(role.getId())
+                    .build(), Pageable.unpaged());
+            for (var permission : rolePermissions.get()
+                    .toList()) {
+                log.info("role {} permission {}", role.getName(), permission.getName());
+                assertThat(permission.getName()).isIn(value);
+            }
+            var permissionsCount = rolePermissions.getNumberOfElements();
+            assertThat(permissionsCount).isEqualTo(value.size());
+        }
     }
 }

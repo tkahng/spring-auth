@@ -12,10 +12,14 @@ import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface RbacService {
+    Map<String, List<String>> getRolePermissionMap();
+
     Role createRole(@Valid CreateRoleDto createRoleDto);
 
     Optional<Role> findRoleByName(String name);
