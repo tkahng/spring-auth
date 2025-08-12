@@ -116,10 +116,11 @@ public class RbacServiceImpl implements RbacService {
             return;
         }
         var rolePermission = RolePermission.builder()
-                .id(RolePermissionId.builder()
-                        .roleId(role.getId())
-                        .permissionId(permission.getId())
-                        .build())
+                .id(
+                        RolePermissionId.builder()
+                                .roleId(role.getId())
+                                .permissionId(permission.getId())
+                                .build())
                 .role(role)
                 .permission(permission)
                 .build();
