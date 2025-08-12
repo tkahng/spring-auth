@@ -8,7 +8,10 @@ import com.tkahng.spring_auth.repository.PermissionRepository;
 import com.tkahng.spring_auth.repository.RolePermissionRepository;
 import com.tkahng.spring_auth.repository.RoleRepository;
 import com.tkahng.spring_auth.repository.UserRoleRepository;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -40,6 +43,22 @@ public class RbacServiceImpl implements RbacService {
         this.rolePermissionMap.put("admin", List.of("basic", "pro", "advanced", "admin"));
     }
 
+    public static Specification<Permission> notAssignedToRole(UUID roleId) {
+        return (root, query, cb) -> {
+            // Subquery for role_permissions.permission_id
+            Subquery<UUID> subquery = query.subquery(UUID.class);
+            Root<RolePermission> rpRoot = subquery.from(RolePermission.class);
+            subquery.select(rpRoot.get("id")
+                            .get("permissionId"))
+                    .where(cb.equal(rpRoot.get("id")
+                            .get("roleId"), roleId));
+
+            // p.id NOT IN (subquery)
+            return cb.not(root.get("id")
+                    .in(subquery));
+        };
+    }
+
     @Override
     public Permission createPermission(@NonNull CreatePermissionDto createPermissionDto) {
         return permissionRepository.saveAndFlush(Permission.builder()
@@ -57,7 +76,7 @@ public class RbacServiceImpl implements RbacService {
     }
 
     @Override
-    public void assignRoleToUser(User user, Role role) {
+    public void assignRoleToUser(@NotNull User user, @NotNull Role role) {
         UserRole userRole = new UserRole();
         userRole.setId(UserRoleId.builder()
                 .userId(user.getId())
