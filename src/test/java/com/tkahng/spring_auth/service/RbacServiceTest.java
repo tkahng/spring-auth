@@ -3,6 +3,8 @@ package com.tkahng.spring_auth.service;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.CreatePermissionDto;
 import com.tkahng.spring_auth.dto.CreateRoleDto;
+import com.tkahng.spring_auth.dto.PermissionFilter;
+import com.tkahng.spring_auth.dto.RoleFilter;
 import com.tkahng.spring_auth.repository.PermissionRepository;
 import com.tkahng.spring_auth.repository.RoleRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,6 +178,13 @@ class RbacServiceTest {
     @Test
     void initRolesAndPermissions() {
         rbacService.initRolesAndPermissions();
-
+        var roles = rbacService.findAllRoles(RoleFilter.builder()
+                .build(), Pageable.unpaged());
+        assertThat(roles).isNotNull();
+        assertThat(roles.getTotalElements()).isEqualTo(4);
+        var permissions = rbacService.findAllPermissions(PermissionFilter.builder()
+                .build(), Pageable.unpaged());
+        assertThat(permissions).isNotNull();
+        assertThat(permissions.getTotalElements()).isEqualTo(4);
     }
 }

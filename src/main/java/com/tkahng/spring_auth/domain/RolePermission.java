@@ -13,12 +13,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "role_permission")
+@Table(name = "role_permissions")
 public class RolePermission {
 
     @EmbeddedId
     private RolePermissionId id;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("roleId")
     @JoinColumn(name = "role_id")
