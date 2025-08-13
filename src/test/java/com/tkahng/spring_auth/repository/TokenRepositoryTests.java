@@ -29,13 +29,14 @@ public class TokenRepositoryTests {
     public void testThatTokenExpiredCanBeCreatedAndNotRetrieved() {
         var token = Token.builder()
                 .identifier("identifier2")
+                .type("type")
                 .expires(OffsetDateTime.now()
                         .minusSeconds(1)
                 )
                 .value("value2")
                 .build();
         var savedToken = tokenRepository.saveAndFlush(token);
-        var retrievedToken = tokenRepository.findByValueAndExpiresAfter("value2", OffsetDateTime.now())
+        var retrievedToken = tokenRepository.findByValueAndTypeAndExpiresAfter("value2", "type", OffsetDateTime.now())
                 .orElse(null);
         assertThat(retrievedToken).isNull();
     }
@@ -44,12 +45,13 @@ public class TokenRepositoryTests {
     public void testThatTokenNotExpiredCanBeCreatedAndRetrieved() {
         var token = Token.builder()
                 .identifier("identifier")
+                .type("type")
                 .expires(OffsetDateTime.now()
                         .plusDays(7))
                 .value("value")
                 .build();
         var savedToken = tokenRepository.saveAndFlush(token);
-        var retrievedToken = tokenRepository.findByValueAndExpiresAfter("value", OffsetDateTime.now())
+        var retrievedToken = tokenRepository.findByValueAndTypeAndExpiresAfter("value", "type", OffsetDateTime.now())
                 .orElse(null);
         assertThat(retrievedToken).isNotNull();
     }
@@ -58,15 +60,17 @@ public class TokenRepositoryTests {
     public void testThatTokenCanBeDeletedByValue() {
         var token = Token.builder()
                 .identifier("identifier3")
+                .type("type")
                 .expires(OffsetDateTime.now()
                         .plusDays(7))
                 .value("value3")
                 .build();
         tokenRepository.saveAndFlush(token);
-        var retrievedToken = tokenRepository.findByValueAndExpiresAfter("value3", OffsetDateTime.now());
+        var retrievedToken = tokenRepository.findByValueAndTypeAndExpiresAfter("value3", "type", OffsetDateTime.now());
         assertThat(retrievedToken).isPresent();
         tokenRepository.deleteById(token.getId());
-        var retrievedTokenAgain = tokenRepository.findByValueAndExpiresAfter("value3", OffsetDateTime.now());
+        var retrievedTokenAgain = tokenRepository.findByValueAndTypeAndExpiresAfter("value3", "type",
+                OffsetDateTime.now());
         assertThat(retrievedTokenAgain).isEmpty();
     }
 }

@@ -6,7 +6,6 @@ import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
-import com.tkahng.spring_auth.dto.CreateTokenDto;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +19,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
     private final PasswordService passwordService;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final RbacService rbacService;
+    private final TokenService tokenService;
 
 
     @Override
@@ -113,12 +112,7 @@ public class AuthServiceImpl implements AuthService {
 
     public AuthenticationResponse generateToken(@NotNull User user) throws Exception {
         var accessToken = jwtService.generateToken(user.getEmail());
-        var token = UUID.randomUUID()
-                .toString();
-        var refreshToken = refreshTokenService.generateRefreshToken(CreateTokenDto.builder()
-                .value(token)
-                .identifier(user.getEmail())
-                .build());
+        var refreshToken = tokenService.generateRefreshToken(user.getEmail());
         return new AuthenticationResponse(accessToken, refreshToken);
     }
 
@@ -148,20 +142,27 @@ public class AuthServiceImpl implements AuthService {
         var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider()
                 .toString());
 
+        // check if credentials account already exists
+        // if it does, throw error
         if (existingUserAccount.getAccount() != null) {
-            throw new Exception("user already exists");
+            throw new Exception("user account already exists. please login");
         }
+        User user;
+        // check if user already exists. if not, create user
         if (existingUserAccount.getUser() == null) {
-            throw new Exception("user already exists");
-
+            user = createUser(authDto);
+        } else {
+            user = existingUserAccount.getUser();
         }
-        var userAccount = createUserAndAccount(authDto);
-        return generateToken(userAccount.getUser());
+        // create account
+        var account = createAccount(authDto, user);
+        return generateToken(user);
+
     }
 
     @Override
     public AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception {
-        var identifier = refreshTokenService.validateRefreshToken(refreshToken);
+        var identifier = tokenService.validateRefreshToken(refreshToken);
         var user = findUserByEmail(identifier)
                 .orElseThrow(() -> new Exception("user not found"));
         return generateToken(user);

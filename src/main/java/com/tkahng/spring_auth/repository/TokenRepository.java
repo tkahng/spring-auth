@@ -13,5 +13,7 @@ import java.util.UUID;
 public interface TokenRepository extends JpaRepository<Token, UUID>, JpaSpecificationExecutor<Token> {
     Optional<Token> findByValueAndExpiresAfter(String value, OffsetDateTime expiresAt);
 
+    Optional<Token> findByValueAndTypeAndExpiresAfter(String value, String type, OffsetDateTime expiresAt);
+
     void deleteByValue(String value);
 }

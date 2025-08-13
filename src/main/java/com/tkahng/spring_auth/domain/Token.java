@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -35,13 +34,14 @@ public class Token {
     @Column(nullable = false, unique = true, columnDefinition = "text")
     private String value;
 
+    @Column(nullable = false, columnDefinition = "text")
+    private String type;
+
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    @ColumnDefault("now()")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    @ColumnDefault("now()")
     private LocalDateTime updatedAt;
 }
