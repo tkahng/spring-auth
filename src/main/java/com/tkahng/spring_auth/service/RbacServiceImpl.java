@@ -10,14 +10,12 @@ import com.tkahng.spring_auth.repository.RolePermissionRepository;
 import com.tkahng.spring_auth.repository.RoleRepository;
 import com.tkahng.spring_auth.repository.UserRoleRepository;
 import com.tkahng.spring_auth.spec.PermissionSpecifications;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
+import com.tkahng.spring_auth.spec.RoleSpecifications;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,7 +32,8 @@ public class RbacServiceImpl implements RbacService {
     private final UserRoleRepository userRoleRepository;
     private final Map<String, List<String>> rolePermissionMap;
 
-    public RbacServiceImpl(PermissionRepository permissionRepository, RoleRepository roleRepository, RolePermissionRepository rolePermissionRepository, UserRoleRepository userRoleRepository) {
+    public RbacServiceImpl(PermissionRepository permissionRepository, RoleRepository roleRepository,
+                           RolePermissionRepository rolePermissionRepository, UserRoleRepository userRoleRepository) {
         this.permissionRepository = permissionRepository;
         this.roleRepository = roleRepository;
         this.rolePermissionRepository = rolePermissionRepository;
@@ -46,35 +45,6 @@ public class RbacServiceImpl implements RbacService {
         this.rolePermissionMap.put("admin", List.of("basic", "pro", "advanced", "admin"));
     }
 
-    public static Specification<Permission> notAssignedToRole(UUID roleId) {
-        return (root, query, cb) -> {
-            // Subquery for role_permissions.permission_id
-            Subquery<UUID> subquery = query.subquery(UUID.class);
-            Root<RolePermission> rp = subquery.from(RolePermission.class);
-            subquery.select(rp.get("id")
-                            .get("permissionId"))
-                    .where(cb.equal(rp.get("id")
-                            .get("roleId"), roleId));
-
-            // p.id NOT IN (subquery)
-            return cb.not(root.get("id")
-                    .in(subquery));
-        };
-    }
-
-    public static Specification<Permission> belongsToRole(UUID roleId) {
-        return (root, query, cb) -> {
-            Subquery<UUID> subquery = query.subquery(UUID.class);
-            Root<RolePermission> rp = subquery.from(RolePermission.class);
-            subquery.select(rp.get("id")
-                            .get("permissionId"))
-                    .where(cb.equal(rp.get("id")
-                            .get("roleId"), roleId));
-
-            return root.get("id")
-                    .in(subquery);
-        };
-    }
 
     @Override
     public Permission createPermission(@NonNull CreatePermissionDto createPermissionDto) {
@@ -99,19 +69,28 @@ public class RbacServiceImpl implements RbacService {
 
     @Override
     public void assignRoleToUser(@NotNull User user, @NotNull Role role) {
-        UserRole userRole = new UserRole();
-        userRole.setId(UserRoleId.builder()
-                .userId(user.getId())
-                .roleId(role.getId())
-                .build());
-        userRole.setUser(user);
-        userRole.setRole(role);
+        var existingUserRole = userRoleRepository.findByUserIdAndRoleId(user.getId(),
+                role.getId());
+        if (existingUserRole.isPresent()) {
+            return;
+        }
+        UserRole userRole = UserRole.builder()
+                .id(
+                        UserRoleId.builder()
+                                .userId(user.getId())
+                                .roleId(role.getId())
+                                .build()
+                )
+                .user(user)
+                .role(role)
+                .build();
         userRoleRepository.saveAndFlush(userRole);
     }
 
     @Override
     public void assignPermissionToRole(Role role, Permission permission) {
-        var existingRolePermission = rolePermissionRepository.findByRoleIdAndPermissionId(role.getId(), permission.getId());
+        var existingRolePermission = rolePermissionRepository.findByRoleIdAndPermissionId(role.getId(),
+                permission.getId());
         if (existingRolePermission.isPresent()) {
             return;
         }
@@ -149,42 +128,9 @@ public class RbacServiceImpl implements RbacService {
         return role;
     }
 
-    private Specification<Role> filterRoles(RoleFilter filter) {
-        return (root, query, cb) -> {
-            var predicates = cb.conjunction();
-
-            if (filter.getIds() != null && !filter.getIds()
-                    .isEmpty()) {
-                predicates.getExpressions()
-                        .add(root.get("id")
-                                .in(filter.getIds()));
-            }
-
-            if (filter.getName() != null && !filter.getName()
-                    .isBlank()) {
-                predicates.getExpressions()
-                        .add(
-                                cb.like(cb.lower(root.get("name")), "%" + filter.getName()
-                                        .toLowerCase() + "%")
-                        );
-            }
-
-            if (filter.getDescription() != null && !filter.getDescription()
-                    .isBlank()) {
-                predicates.getExpressions()
-                        .add(
-                                cb.like(cb.lower(root.get("description")), "%" + filter.getDescription()
-                                        .toLowerCase() + "%")
-                        );
-            }
-
-            return predicates;
-        };
-    }
-
     @Override
     public Page<Role> findAllRoles(RoleFilter filter, Pageable pageable) {
-        return roleRepository.findAll(filterRoles(filter), pageable);
+        return roleRepository.findAll(RoleSpecifications.buildSpec(filter), pageable);
     }
 
     @Override
@@ -209,54 +155,6 @@ public class RbacServiceImpl implements RbacService {
         return permission;
     }
 
-    private Specification<Permission> filterPermission(PermissionFilter filter) {
-        return (root, query, cb) -> {
-            var predicates = cb.conjunction();
-
-            if (filter.getIds() != null && !filter.getIds()
-                    .isEmpty()) {
-                predicates.getExpressions()
-                        .add(root.get("id")
-                                .in(filter.getIds()));
-            }
-
-            if (filter.getName() != null && !filter.getName()
-                    .isBlank()) {
-                predicates.getExpressions()
-                        .add(
-                                cb.like(cb.lower(root.get("name")), "%" + filter.getName()
-                                        .toLowerCase() + "%")
-                        );
-            }
-
-            if (filter.getDescription() != null && !filter.getDescription()
-                    .isBlank()) {
-                predicates.getExpressions()
-                        .add(
-                                cb.like(cb.lower(root.get("description")), "%" + filter.getDescription()
-                                        .toLowerCase() + "%")
-                        );
-            }
-            if (filter.getRoleId() != null) {
-                Subquery<UUID> subquery = query.subquery(UUID.class);
-                Root<RolePermission> rp = subquery.from(RolePermission.class);
-                subquery.select(rp.get("id")
-                                .get("permissionId"))
-                        .where(cb.equal(rp.get("id")
-                                .get("roleId"), filter.getRoleId()));
-
-
-                predicates.getExpressions()
-                        .add(
-                                root.get("id")
-                                        .in(subquery)
-                        );
-            }
-
-            return predicates;
-        };
-    }
-
     @Override
     public Page<Permission> findAllPermissions(PermissionFilter filter, Pageable pageable) {
         return permissionRepository.findAll(PermissionSpecifications.buildSpec(filter), pageable);
@@ -276,6 +174,4 @@ public class RbacServiceImpl implements RbacService {
             }
         }
     }
-
-
 }

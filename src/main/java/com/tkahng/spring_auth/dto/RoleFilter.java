@@ -16,4 +16,5 @@ public class RoleFilter {
     private List<UUID> ids;
     private String name;
     private String description;
+    private UUID userId;
 }

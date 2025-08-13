@@ -17,4 +17,5 @@ public class PermissionFilter {
     private String name;
     private String description;
     private UUID roleId;
+    private UUID userId;
 }

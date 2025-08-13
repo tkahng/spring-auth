@@ -2,6 +2,7 @@ package com.tkahng.spring_auth.spec;
 
 import com.tkahng.spring_auth.domain.Permission;
 import com.tkahng.spring_auth.domain.RolePermission;
+import com.tkahng.spring_auth.domain.UserRole;
 import com.tkahng.spring_auth.dto.PermissionFilter;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -31,7 +32,9 @@ public class PermissionSpecifications {
         if (filter.getRoleId() != null) {
             specs.add(belongsToRole(filter.getRoleId()));
         }
-
+        if (filter.getUserId() != null) {
+            specs.add(belongsToUser2(filter.getUserId()));
+        }
         return Specification.allOf(specs); // new recommended way
     }
 
@@ -60,6 +63,55 @@ public class PermissionSpecifications {
                             .get("roleId"), roleId));
             return root.get("id")
                     .in(subquery);
+        };
+    }
+
+    public static Specification<Permission> belongsToUser2(UUID userId) {
+        return (root, query, cb) -> {
+            Subquery<UUID> subquery = query.subquery(UUID.class);
+            Root<RolePermission> rpRoot = subquery.from(RolePermission.class);
+            Root<UserRole> urRoot = subquery.from(UserRole.class);
+
+            subquery.select(rpRoot.get("id")
+                            .get("permissionId"))
+                    .distinct(true)
+                    .where(
+                            cb.equal(urRoot.get("id")
+                                    .get("userId"), userId),
+                            cb.equal(urRoot.get("id")
+                                    .get("roleId"), rpRoot.get("id")
+                                    .get("roleId"))
+                    );
+
+            return root.get("id")
+                    .in(subquery);
+        };
+    }
+
+    public static Specification<Permission> belongsToUser(UUID userId) {
+        return (root, query, cb) -> {
+            query.distinct(true); // ensure uniqueness in SQL result
+
+            // Subquery to get role IDs for the user
+            Subquery<UUID> rolesSubquery = query.subquery(UUID.class);
+            Root<UserRole> ur = rolesSubquery.from(UserRole.class);
+            rolesSubquery.select(ur.get("id")
+                            .get("roleId"))
+                    .where(cb.equal(ur.get("id")
+                            .get("userId"), userId));
+
+            // Subquery to get permission IDs from those roles
+            Subquery<UUID> permsSubquery = query.subquery(UUID.class);
+            Root<RolePermission> rp = permsSubquery.from(RolePermission.class);
+            permsSubquery.select(rp.get("id")
+                            .get("permissionId"))
+                    .where(rp.get("id")
+                            .get("roleId")
+                            .in(rolesSubquery));
+
+            // Main query: permission.id in (permissions for roles for this user)
+            return root.get("id")
+                    .in(permsSubquery);
         };
     }
 }
