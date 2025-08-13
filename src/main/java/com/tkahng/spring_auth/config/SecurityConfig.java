@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -37,18 +35,6 @@ public class SecurityConfig {
     @Value("${jwt.key}")
     private String jwtKey;
 
-    @Bean
-    static RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.withDefaultRolePrefix()
-                .role("admin")
-                .implies("advanced")
-                .role("advanced")
-                .implies("pro")
-                .role("pro")
-                .implies("basic")
-                .build();
-    }
-
     /**
      * this allows us to use templating in security expressions.
      * e.g. @PreAuthorize("hasRole(#role)")
@@ -60,9 +46,9 @@ public class SecurityConfig {
 
     // and, if using pre-post method security also add
     @Bean
-    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy);
+        //expressionHandler.setRoleHierarchy(roleHierarchy);
         return expressionHandler;
     }
 
@@ -134,11 +120,8 @@ public class SecurityConfig {
 
         // 👇 Set the claim name that contains your roles in the JWT
         // For example, if your JWT has { "roles": ["basic", "admin"] }
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-
-        // 👇 Add ROLE_ prefix so that hasRole('basic') works
-        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
 

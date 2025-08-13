@@ -48,9 +48,11 @@ public class ProtectedControllerTests {
     public void testBasicRole() throws Exception {
         var user = createUserWithRole("basic");
         var roles = authService.getRoleNamesByUserId(user.getId());
+        var permissions = authService.getPermissionNamesByUserId(user.getId());
         var token = jwtService.generateToken(JwtDto.builder()
                 .email(user.getEmail())
                 .roles(roles)
+                .permissions(permissions)
                 .build());
         mockMvc.perform(get("/api/protected/basic")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
@@ -68,6 +70,8 @@ public class ProtectedControllerTests {
                 .provider(AuthProvider.CREDENTIALS)
                 .build());
         var role = rbacService.findOrCreateRoleByName(roleName);
+        var permission = rbacService.findOrCreatePermissionByName(roleName);
+        rbacService.assignPermissionToRole(role, permission);
         rbacService.assignRoleToUser(user.getUser(), role);
         return user.getUser();
     }

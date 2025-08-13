@@ -97,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserAccount linkAccount(@NotNull AuthDto authDto, User user) {
+    public UserAccount linkAccount(@NotNull AuthDto authDto, @NotNull User user) {
         return createAccountFromUser(authDto, user);
     }
 

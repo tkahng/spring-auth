@@ -18,18 +18,18 @@ public class JwtServiceImpl implements JwtService {
 
     public String generateToken(JwtDto dto) {
         Instant now = Instant.now();
-        var roles = dto.getRoles();
+        //var roles = dto.getRoles();
         var permissions = dto.getPermissions();
         JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
                 .issuer("your-app")
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(3600))
                 .subject(dto.getEmail());
-        if (roles != null && !roles.isEmpty()) {
-            claims.claim("roles", roles);
-        }
+        // if (roles != null && !roles.isEmpty()) {
+        //    claims.claim("roles", roles);
+        //}
         if (permissions != null && !permissions.isEmpty()) {
-            claims.claim("permissions", permissions);
+            claims.claim("authorities", permissions);
         }
 
 

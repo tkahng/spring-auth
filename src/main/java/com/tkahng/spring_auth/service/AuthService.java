@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AuthService {
+    // CRUD Methods -------------------------------------------------------------
     Optional<User> findUserByEmail(String email);
 
     UserAccount findUserAccountByEmailAndProviderId(String email, String providerId);
@@ -71,8 +72,15 @@ public interface AuthService {
      * @param user    existing user
      * @return UserAccount
      */
-    UserAccount linkAccount(@NotNull AuthDto authDto, User user);
+    UserAccount linkAccount(@NotNull AuthDto authDto, @NotNull User user);
 
+    /**
+     * generates a new token for the user.
+     *
+     * @param user user
+     * @return AuthenticationResponse
+     * @throws Exception exception
+     */
     AuthenticationResponse generateToken(@NotNull User user) throws Exception;
 
     AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception;
