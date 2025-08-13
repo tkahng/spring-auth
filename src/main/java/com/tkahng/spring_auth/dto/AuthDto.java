@@ -1,7 +1,11 @@
 package com.tkahng.spring_auth.dto;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
+import java.time.OffsetDateTime;
+
+@Accessors(chain = true)
 @Data
 @Builder
 @AllArgsConstructor
@@ -35,4 +39,5 @@ public class AuthDto {
     private String accountId;
 
     private boolean emailVerified;
+    private OffsetDateTime emailVerifiedAt;
 }

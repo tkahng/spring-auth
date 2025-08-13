@@ -23,6 +23,8 @@ public interface AuthService {
 
     UserAccount createUserAndAccount(@NotNull AuthDto authDto);
 
+    UserAccount findOrCreateUserAndCreateAccount(@NotNull AuthDto authDto);
+
     AuthenticationResponse generateToken(@NotNull User user) throws Exception;
 
     AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception;
@@ -30,4 +32,6 @@ public interface AuthService {
     AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception;
 
     AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception;
+
+    Account createSuperUser(String email, String password);
 }

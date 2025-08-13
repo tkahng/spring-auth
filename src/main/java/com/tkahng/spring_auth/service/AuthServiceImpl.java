@@ -4,6 +4,7 @@ import com.tkahng.spring_auth.domain.Account;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
+import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.CreateTokenDto;
 import com.tkahng.spring_auth.repository.AccountRepository;
@@ -23,6 +24,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordService passwordService;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final RbacService rbacService;
 
 
     @Override
@@ -55,20 +57,25 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User createUser(@NotNull AuthDto authDto) {
-        var user = new User();
-        user.setEmail(authDto.getEmail());
-        user.setName(authDto.getName());
+        var user = User.builder()
+                .email(authDto.getEmail())
+                .name(authDto.getName())
+                .emailVerifiedAt(authDto.getEmailVerifiedAt())
+                .build();
         return userRepository.saveAndFlush(user);
     }
 
 
     @Override
     public Account createAccount(@NotNull AuthDto authDto, User user) {
-        var account = new Account();
-        account.setUser(user);
-        account.setProviderId(authDto.getProvider()
-                .toString());
-        account.setAccountId(authDto.getAccountId());
+        var account = Account.builder()
+                .user(user)
+                .providerId(
+                        authDto.getProvider()
+                                .toString()
+                )
+                .accountId(authDto.getAccountId())
+                .build();
         if (authDto.getPassword() != null) {
             var hashedPassword = passwordService.encode(authDto.getPassword());
             account.setPassword_hash(hashedPassword);
@@ -76,12 +83,30 @@ public class AuthServiceImpl implements AuthService {
         return accountRepository.saveAndFlush(account);
     }
 
+
     @Override
     public UserAccount createUserAndAccount(@NotNull AuthDto authDto) {
         var userAccount = new UserAccount();
         var user = createUser(authDto);
         userAccount.setUser(user);
         var account = createAccount(authDto, user);
+        userAccount.setAccount(account);
+        return userAccount;
+    }
+
+    @Override
+    public UserAccount findOrCreateUserAndCreateAccount(@NotNull AuthDto authDto) {
+        var userAccount = new UserAccount();
+        User user = findUserByEmail(authDto.getEmail()).orElse(null);
+        if (user == null) {
+            user = createUser(authDto);
+        }
+        Account account = findAccountByUserIdAndProviderId(user.getId(), authDto.getProvider()
+                .toString()).orElse(null);
+        if (account == null) {
+            account = createAccount(authDto, user);
+        }
+        userAccount.setUser(user);
         userAccount.setAccount(account);
         return userAccount;
     }
@@ -122,8 +147,13 @@ public class AuthServiceImpl implements AuthService {
     public AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception {
         var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider()
                 .toString());
-        if (existingUserAccount.getUser() != null) {
+
+        if (existingUserAccount.getAccount() != null) {
             throw new Exception("user already exists");
+        }
+        if (existingUserAccount.getUser() == null) {
+            throw new Exception("user already exists");
+
         }
         var userAccount = createUserAndAccount(authDto);
         return generateToken(userAccount.getUser());
@@ -135,6 +165,21 @@ public class AuthServiceImpl implements AuthService {
         var user = findUserByEmail(identifier)
                 .orElseThrow(() -> new Exception("user not found"));
         return generateToken(user);
+    }
+
+    @Override
+    public Account createSuperUser(String email, String password) {
+        var existingUserAccount = findUserAccountByEmailAndProviderId(email, AuthProvider.CREDENTIALS.toString());
+        if (existingUserAccount.getUser() != null) {
+            return existingUserAccount.getAccount();
+        }
+        var userAccount = createUserAndAccount(AuthDto.builder()
+                .email(email)
+                .password(password)
+                .provider(AuthProvider.CREDENTIALS)
+                .accountId(email)
+                .build());
+        return userAccount.getAccount();
     }
 
 }

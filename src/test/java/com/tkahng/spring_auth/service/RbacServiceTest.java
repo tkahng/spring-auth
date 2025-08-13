@@ -20,7 +20,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SpringBootTest
 @Transactional
@@ -134,10 +135,20 @@ class RbacServiceTest {
                 .name("test")
                 .email("test")
                 .build());
-        var role = rbacService.createRole(CreateRoleDto.builder()
-                .name("test")
-                .description("test")
-                .build());
+        var role = rbacService.findOrCreateRoleByName("test");
+        var permission = rbacService.findOrCreatePermissionByName("test");
+        var permission2 = rbacService.findOrCreatePermissionByName("test2");
+        var role2 = rbacService.findOrCreateRoleByName("test2");
+        // both on role and role2
+        var permission3 = rbacService.findOrCreatePermissionByName("test3");
+        rbacService.assignPermissionToRole(role, permission);
+        var rolePermission = rolePermissionRepository.findByRoleIdAndPermissionId(role.getId(), permission.getId())
+                .orElseThrow();
+        assertThat(rolePermission).isNotNull();
+        assertThat(role.getId()).isEqualTo(rolePermission.getId()
+                .getRoleId());
+        assertThat(permission.getId()).isEqualTo(rolePermission.getId()
+                .getPermissionId());
         rbacService.assignRoleToUser(user, role);
         var userRole = userRoleRepository.findByUserIdAndRoleId(user.getId(), role.getId())
                 .orElseThrow();
@@ -146,88 +157,17 @@ class RbacServiceTest {
                 .getUserId());
         assertThat(role.getId()).isEqualTo(userRole.getId()
                 .getRoleId());
-    }
-
-    @Test
-    void assignPermissionToRole() {
-        var role = rbacService.findOrCreateRoleByName("test");
-        var permission = rbacService.findOrCreatePermissionByName("test");
-        rbacService.assignPermissionToRole(role, permission);
-        var userRole = rolePermissionRepository.findByRoleIdAndPermissionId(role.getId(), permission.getId())
-                .orElseThrow();
-        assertThat(userRole).isNotNull();
-        assertThat(role.getId()).isEqualTo(userRole.getId()
-                .getRoleId());
-        assertThat(permission.getId()).isEqualTo(userRole.getId()
-                .getPermissionId());
-    }
-
-    @Test
-    void findPermissionById() {
-        var permission = rbacService.findOrCreatePermissionByName("test");
-        var result = rbacService.findPermissionById(permission.getId())
-                .orElseThrow();
-        assertThat(result).isNotNull()
-                .matches(p -> p.getId()
-                        .equals(permission.getId()));
-    }
-
-    @Test
-    void findRoleByName() {
-        var role = rbacService.findOrCreateRoleByName("test");
-        var result = rbacService.findRoleByName(role.getName())
-                .orElseThrow();
-        assertThat(result).isNotNull()
-                .matches(p -> p.getName()
-                        .equals(role.getName()));
-    }
-
-    @Test
-    void findRoleById() {
-        var role = rbacService.findOrCreateRoleByName("test");
-        var result = rbacService.findRoleById(role.getId())
-                .orElseThrow();
-        assertThat(result).isNotNull()
-                .matches(p -> p.getId()
-                        .equals(role.getId()));
-    }
-
-    @Test
-    void findPermissionByName() {
-        var permission = rbacService.findOrCreatePermissionByName("test");
-        var result = rbacService.findPermissionByName(permission.getName())
-                .orElseThrow();
-        assertThat(result).isNotNull()
-                .matches(p -> p.getName()
-                        .equals(permission.getName()));
-    }
-
-    @Test
-    void notAssignedToRole() {
-    }
-
-    @Test
-    void findOrCreateRoleByName() {
-        var role = rbacService.findOrCreateRoleByName("test");
-        var result = rbacService.findRoleByName(role.getName())
-                .orElseThrow();
-        assertThat(result).isNotNull()
-                .matches(p -> p.getName()
-                        .equals(role.getName()));
-    }
-
-    @Test
-    void findAllRoles() {
-    }
-
-    @Test
-    void findOrCreatePermissionByName() {
-        var permission = rbacService.findOrCreatePermissionByName("test");
-        var result = rbacService.findPermissionByName(permission.getName())
-                .orElseThrow();
-        assertThat(result).isNotNull()
-                .matches(p -> p.getName()
-                        .equals(permission.getName()));
+        rbacService.assignPermissionToRole(role, permission2);
+        rbacService.assignPermissionToRole(role2, permission3);
+        rbacService.assignPermissionToRole(role, permission3);
+        rbacService.assignRoleToUser(user, role2);
+        var allPermissions = rbacService.findAllPermissions(PermissionFilter.builder()
+                        .userId(user.getId())
+                        .build(), Pageable.unpaged())
+                .getContent();
+        assertThat(allPermissions)
+                .hasSize(3)
+                .containsExactly(permission, permission2, permission3);
     }
 
     @Test

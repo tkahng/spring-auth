@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder()
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "users")
@@ -48,5 +48,5 @@ public class User {
     @Column(nullable = false)
     @ColumnDefault("now()")
     private LocalDateTime updatedAt;
-    
+
 }
