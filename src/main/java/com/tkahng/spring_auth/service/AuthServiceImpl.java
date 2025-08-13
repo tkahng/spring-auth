@@ -109,6 +109,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .roles(roles)
                 .permissions(permissions)
+                .emailVerifiedAt(user.getEmailVerifiedAt())
                 .build());
         var refreshToken = tokenService.generateRefreshToken(user.getEmail());
         return new AuthenticationResponse(accessToken, refreshToken);

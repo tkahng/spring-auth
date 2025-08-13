@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.dto.JwtDto;
+import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.service.AuthService;
 import com.tkahng.spring_auth.service.JwtService;
 import com.tkahng.spring_auth.service.RbacService;
@@ -16,12 +16,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -45,27 +48,70 @@ public class ProtectedControllerTests {
 
     @Test
     @Rollback
-    public void testBasicRole() throws Exception {
-        var user = createUserWithRole("basic");
-        var roles = authService.getRoleNamesByUserId(user.getId());
-        var permissions = authService.getPermissionNamesByUserId(user.getId());
-        var token = jwtService.generateToken(JwtDto.builder()
-                .email(user.getEmail())
-                .roles(roles)
-                .permissions(permissions)
-                .build());
-        mockMvc.perform(get("/api/protected/basic")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-                .andExpect(status().isOk());
+    public void testBasicSuccess() throws Exception {
+        testProtectedEndpoint("basic", "basic", false);
 
     }
 
-    private User createUserWithRole(String roleName) {
+    @Test
+    @Rollback
+    public void testProSuccess() throws Exception {
+        testProtectedEndpoint("pro", "pro", false);
+
+    }
+
+    @Test
+    @Rollback
+    public void testAdvancedSuccess() throws Exception {
+        testProtectedEndpoint("advanced", "advanced", false);
+    }
+
+    @Test
+    @Rollback
+    public void testAdminSuccess() throws Exception {
+        testProtectedEndpoint("admin", "admin", false);
+    }
+
+    @Test
+    @Rollback
+    public void testProWithBasicFail() throws Exception {
+        testProtectedEndpoint("basic", "pro", true);
+    }
+
+    @Test
+    @Rollback
+    public void testAdvancedWithProFail() throws Exception {
+        testProtectedEndpoint("pro", "advanced", true);
+    }
+
+
+    private void testProtectedEndpoint(String scope, String endPoint, boolean fail) throws Exception {
+        var user = createUserWithRoleAndPermission(scope);
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                    { "email": "test@example.com", "password": "Password123!" }
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        AuthenticationResponse authResponse =
+                objectMapper.readValue(loginResult.getResponse()
+                                .getContentAsString(),
+                        AuthenticationResponse.class);
+
+        String accessToken = authResponse.getAccessToken();
+        mockMvc.perform(get("/api/protected/" + endPoint)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(fail ? status().isForbidden() : status().isOk());
+    }
+
+    private User createUserWithRoleAndPermission(String roleName) {
         rbacService.initRolesAndPermissions();
         var user = authService.createUserAndAccount(AuthDto.builder()
-                .email("test@test.com")
+                .email("test@example.com")
                 .name("test")
-                .password("test")
+                .password("Password123!")
                 .accountId("test")
                 .provider(AuthProvider.CREDENTIALS)
                 .build());
