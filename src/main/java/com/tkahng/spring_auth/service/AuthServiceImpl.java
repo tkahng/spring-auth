@@ -30,11 +30,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Optional<Account> findAccountByUserIdAndProviderId(UUID userId, String providerId) {
-        return accountRepository.findByUserIdAndProviderId(userId, providerId);
-    }
-
-    @Override
     public UserAccount findUserAccountByEmailAndProviderId(String email, String providerId) {
         var userAccount = new UserAccount();
         Optional<User> user = userRepository.findByEmail(email);
@@ -83,12 +78,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserAccount createUserAndAccount(@NotNull AuthDto authDto) {
-        var userAccount = new UserAccount();
         var user = createUser(authDto);
-        userAccount.setUser(user);
+        return createAccountFromUser(authDto, user);
+    }
+
+    @Override
+    public UserAccount createAccountFromUser(@NotNull AuthDto authDto, User user) {
         var account = createAccount(authDto, user);
+        var userAccount = new UserAccount();
+        userAccount.setUser(user);
         userAccount.setAccount(account);
         return userAccount;
+    }
+
+    @Override
+    public UserAccount signupNewUser(@NotNull AuthDto authDto) {
+        return createUserAndAccount(authDto);
+    }
+
+    @Override
+    public UserAccount linkAccount(@NotNull AuthDto authDto, User user) {
+        return createAccountFromUser(authDto, user);
     }
 
     @Override
@@ -96,6 +106,7 @@ public class AuthServiceImpl implements AuthService {
         var roles = getRoleNamesByUserId(user.getId());
         var permissions = getPermissionNamesByUserId(user.getId());
         var accessToken = jwtService.generateToken(JwtDto.builder()
+                .email(user.getEmail())
                 .roles(roles)
                 .permissions(permissions)
                 .build());
@@ -134,16 +145,16 @@ public class AuthServiceImpl implements AuthService {
         if (existingUserAccount.getAccount() != null) {
             throw new Exception("user account already exists. please login");
         }
-        User user;
-        // check if user already exists. if not, create user
+        UserAccount newUserAccount;
+        // if user does not exist, this is a new signup.
         if (existingUserAccount.getUser() == null) {
-            user = createUser(authDto);
+            newUserAccount = signupNewUser(authDto);
         } else {
-            user = existingUserAccount.getUser();
+            // if user exists, link account
+            newUserAccount = linkAccount(authDto, existingUserAccount.getUser());
         }
         // create account
-        var account = createAccount(authDto, user);
-        return generateToken(user);
+        return generateToken(newUserAccount.getUser());
 
     }
 

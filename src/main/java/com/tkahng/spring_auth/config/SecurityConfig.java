@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.annotation.AnnotationTemplateExpressionDefaults;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -46,6 +47,15 @@ public class SecurityConfig {
                 .role("pro")
                 .implies("basic")
                 .build();
+    }
+
+    /**
+     * this allows us to use templating in security expressions.
+     * e.g. @PreAuthorize("hasRole(#role)")
+     */
+    @Bean
+    static AnnotationTemplateExpressionDefaults templateExpressionDefaults() {
+        return new AnnotationTemplateExpressionDefaults();
     }
 
     // and, if using pre-post method security also add

@@ -1,5 +1,6 @@
 package com.tkahng.spring_auth.controller;
 
+import com.tkahng.spring_auth.annotation.HasRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class ProtectedController {
     }
 
     @GetMapping("/basic")
-    @PreAuthorize("hasRole('basic')")
+    @HasRole("basic")
     public String basic() {
         return "basic";
     }

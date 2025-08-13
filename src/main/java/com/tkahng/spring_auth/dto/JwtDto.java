@@ -1,6 +1,5 @@
 package com.tkahng.spring_auth.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,6 @@ import java.util.List;
 @Data
 @Builder
 public class JwtDto {
-    @Email
     @NotEmpty
     private String email;
     private List<String> roles;
