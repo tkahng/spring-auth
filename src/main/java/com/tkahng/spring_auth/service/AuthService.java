@@ -7,6 +7,7 @@ import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,8 +24,6 @@ public interface AuthService {
 
     UserAccount createUserAndAccount(@NotNull AuthDto authDto);
 
-    UserAccount findOrCreateUserAndCreateAccount(@NotNull AuthDto authDto);
-
     AuthenticationResponse generateToken(@NotNull User user) throws Exception;
 
     AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception;
@@ -33,5 +32,9 @@ public interface AuthService {
 
     AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception;
 
-    Account createSuperUser(String email, String password);
+    void createSuperUser(String email, String password) throws Exception;
+
+    List<String> getRoleNamesByUserId(UUID userId);
+
+    List<String> getPermissionNamesByUserId(UUID userId);
 }

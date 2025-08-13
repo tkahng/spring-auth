@@ -1,17 +1,15 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Account;
-import com.tkahng.spring_auth.domain.User;
-import com.tkahng.spring_auth.domain.UserAccount;
-import com.tkahng.spring_auth.dto.AuthDto;
-import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.dto.AuthenticationResponse;
+import com.tkahng.spring_auth.domain.*;
+import com.tkahng.spring_auth.dto.*;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -94,24 +92,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserAccount findOrCreateUserAndCreateAccount(@NotNull AuthDto authDto) {
-        var userAccount = new UserAccount();
-        User user = findUserByEmail(authDto.getEmail()).orElse(null);
-        if (user == null) {
-            user = createUser(authDto);
-        }
-        Account account = findAccountByUserIdAndProviderId(user.getId(), authDto.getProvider()
-                .toString()).orElse(null);
-        if (account == null) {
-            account = createAccount(authDto, user);
-        }
-        userAccount.setUser(user);
-        userAccount.setAccount(account);
-        return userAccount;
-    }
-
     public AuthenticationResponse generateToken(@NotNull User user) throws Exception {
-        var accessToken = jwtService.generateToken(user.getEmail());
+        var roles = getRoleNamesByUserId(user.getId());
+        var permissions = getPermissionNamesByUserId(user.getId());
+        var accessToken = jwtService.generateToken(JwtDto.builder()
+                .roles(roles)
+                .permissions(permissions)
+                .build());
         var refreshToken = tokenService.generateRefreshToken(user.getEmail());
         return new AuthenticationResponse(accessToken, refreshToken);
     }
@@ -169,10 +156,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Account createSuperUser(String email, String password) {
+    public void createSuperUser(String email, String password) throws Exception {
         var existingUserAccount = findUserAccountByEmailAndProviderId(email, AuthProvider.CREDENTIALS.toString());
         if (existingUserAccount.getUser() != null) {
-            return existingUserAccount.getAccount();
+            throw new Exception("user already exists");
         }
         var userAccount = createUserAndAccount(AuthDto.builder()
                 .email(email)
@@ -180,7 +167,28 @@ public class AuthServiceImpl implements AuthService {
                 .provider(AuthProvider.CREDENTIALS)
                 .accountId(email)
                 .build());
-        return userAccount.getAccount();
+        var role = rbacService.findOrCreateRoleByName("admin");
+        rbacService.assignRoleToUser(userAccount.getUser(), role);
+    }
+
+    @Override
+    public List<String> getRoleNamesByUserId(UUID userId) {
+        return rbacService.findAllRoles(RoleFilter.builder()
+                        .userId(userId)
+                        .build(), Pageable.unpaged())
+                .stream()
+                .map(Role::getName)
+                .toList();
+    }
+
+    @Override
+    public List<String> getPermissionNamesByUserId(UUID userId) {
+        return rbacService.findAllPermissions(PermissionFilter.builder()
+                        .userId(userId)
+                        .build(), Pageable.unpaged())
+                .stream()
+                .map(Permission::getName)
+                .toList();
     }
 
 }

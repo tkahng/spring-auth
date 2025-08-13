@@ -7,3 +7,6 @@ run:
 test:
 	echo "Running tests"
 	./mvnw clean test
+
+migrate:
+	./mvnw clean flyway:migrate

@@ -168,6 +168,13 @@ class RbacServiceTest {
         assertThat(allPermissions)
                 .hasSize(3)
                 .containsExactly(permission, permission2, permission3);
+        var allRoles = rbacService.findAllRoles(RoleFilter.builder()
+                        .userId(user.getId())
+                        .build(), Pageable.unpaged())
+                .getContent();
+        assertThat(allRoles)
+                .hasSize(2)
+                .containsExactly(role, role2);
     }
 
     @Test
