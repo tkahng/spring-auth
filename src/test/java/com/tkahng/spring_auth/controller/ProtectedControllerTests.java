@@ -2,7 +2,6 @@ package com.tkahng.spring_auth.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
@@ -47,79 +46,42 @@ public class ProtectedControllerTests {
 
     @Test
     @Rollback
-    public void testBasicSuccess() throws Exception {
+    public void testBasicRole() throws Exception {
+        createUserWithRoleAndPermission("basic");
+        testProtectedEndpoint("basic", "pro", true);
         testProtectedEndpoint("basic", "basic", false);
     }
 
     @Test
     @Rollback
-    public void testProBasicSuccess() throws Exception {
+    public void testProRole() throws Exception {
+        createUserWithRoleAndPermission("pro");
         testProtectedEndpoint("pro", "basic", false);
-    }
-
-    @Test
-    @Rollback
-    public void testProSuccess() throws Exception {
         testProtectedEndpoint("pro", "pro", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdvancedBasicSuccess() throws Exception {
-        testProtectedEndpoint("advanced", "basic", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdvancedProSuccess() throws Exception {
-        testProtectedEndpoint("advanced", "pro", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdvancedSuccess() throws Exception {
-        testProtectedEndpoint("advanced", "advanced", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdminBasicSuccess() throws Exception {
-        testProtectedEndpoint("admin", "basic", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdminProSuccess() throws Exception {
-        testProtectedEndpoint("admin", "pro", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdminAdvancedSuccess() throws Exception {
-        testProtectedEndpoint("admin", "advanced", false);
-    }
-
-    @Test
-    @Rollback
-    public void testAdminSuccess() throws Exception {
-        testProtectedEndpoint("admin", "admin", false);
-    }
-
-    @Test
-    @Rollback
-    public void testProWithBasicFail() throws Exception {
-        testProtectedEndpoint("basic", "pro", true);
-    }
-
-    @Test
-    @Rollback
-    public void testAdvancedWithProFail() throws Exception {
         testProtectedEndpoint("pro", "advanced", true);
     }
 
+    @Test
+    @Rollback
+    public void testAdvancedRole() throws Exception {
+        createUserWithRoleAndPermission("advanced");
+        testProtectedEndpoint("advanced", "basic", false);
+        testProtectedEndpoint("advanced", "pro", false);
+        testProtectedEndpoint("advanced", "advanced", false);
+
+    }
+
+    @Test
+    @Rollback
+    public void testAdminRole() throws Exception {
+        createUserWithRoleAndPermission("admin");
+        testProtectedEndpoint("admin", "basic", false);
+        testProtectedEndpoint("admin", "pro", false);
+        testProtectedEndpoint("admin", "advanced", false);
+        testProtectedEndpoint("admin", "admin", false);
+    }
 
     private void testProtectedEndpoint(String scope, String endPoint, boolean fail) throws Exception {
-        var user = createUserWithRoleAndPermission(scope);
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -129,9 +91,11 @@ public class ProtectedControllerTests {
                 .andReturn();
 
         AuthenticationResponse authResponse =
-                objectMapper.readValue(loginResult.getResponse()
+                objectMapper.readValue(
+                        loginResult.getResponse()
                                 .getContentAsString(),
-                        AuthenticationResponse.class);
+                        AuthenticationResponse.class
+                );
 
         String accessToken = authResponse.getAccessToken();
         mockMvc.perform(get("/api/protected/" + endPoint)
@@ -139,7 +103,7 @@ public class ProtectedControllerTests {
                 .andExpect(fail ? status().isForbidden() : status().isOk());
     }
 
-    private User createUserWithRoleAndPermission(String roleName) {
+    private void createUserWithRoleAndPermission(String roleName) {
         rbacService.initRolesAndPermissions();
         var user = authService.createUserAndAccount(AuthDto.builder()
                 .email("test@example.com")
@@ -152,6 +116,5 @@ public class ProtectedControllerTests {
         //var permission = rbacService.findOrCreatePermissionByName(roleName);
         //rbacService.assignPermissionToRole(role, permission);
         rbacService.assignRoleToUser(user.getUser(), role);
-        return user.getUser();
     }
 }
