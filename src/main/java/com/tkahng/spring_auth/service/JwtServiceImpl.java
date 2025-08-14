@@ -19,32 +19,33 @@ public class JwtServiceImpl implements JwtService {
 
     public String generateToken(JwtDto dto) {
         Instant now = Instant.now();
+        JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
+                .issuer("your-app")
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(3600))
+                .subject(dto.getEmail())
+                .claim("user_id", dto.getUserId());
+
         ArrayList<String> authorities = new ArrayList<>();
         var roles = dto.getRoles();
         if (roles != null && !roles.isEmpty()) {
             authorities.addAll(roles.stream()
                     .map(s -> "ROLE_" + s)
                     .toList());
+            claims.claim("roles", roles);
         }
         var permissions = dto.getPermissions();
         if (permissions != null && !permissions.isEmpty()) {
             authorities.addAll(permissions);
+            claims.claim("permissions", permissions);
         }
         if (dto.getEmailVerifiedAt() != null) {
             authorities.add("email_verified");
+            claims.claim("email_verified_at", dto.getEmailVerifiedAt());
         }
-        JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
-                .issuer("your-app")
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(3600))
-                .subject(dto.getEmail());
-        // if (roles != null && !roles.isEmpty()) {
-        //    claims.claim("roles", roles);
-        //}
-        if (permissions != null && !permissions.isEmpty()) {
-            claims.claim("authorities", permissions);
+        if (!authorities.isEmpty()) {
+            claims.claim("authorities", authorities);
         }
-
 
         return jwtEncoder.encode(
                         JwtEncoderParameters.from(

@@ -2,19 +2,20 @@ package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.Account;
 import com.tkahng.spring_auth.domain.User;
-import com.tkahng.spring_auth.dto.AuthDto;
-import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.dto.AuthenticationResponse;
+import com.tkahng.spring_auth.dto.*;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
@@ -31,30 +32,47 @@ public class AuthServiceUnitTests {
     private AccountRepository accountRepository;
     @MockitoBean
     private UserRepository userRepository;
+    @MockitoBean
+    private RbacService rbacService;
+    @MockitoBean
+    private TokenService tokenService;
 
     @Test
     public void testLoginSuccess() {
+        var userId = UUID.randomUUID();
         var user = User.builder()
-                .email("email")
+                .id(userId)
+                .email("test@example.com")
                 .build();
-        var password = "password";
+        var password = "Password123!";
         var hashedPassword = passwordService.encode(password);
         var account = Account.builder()
                 .user(user)
                 .providerId(AuthProvider.CREDENTIALS.toString())
-                .accountId("email")
+                .accountId("test@example.com")
                 .password_hash(hashedPassword)
                 .build();
-        when(userRepository.findByEmail("email")).thenReturn(Optional.of(User.builder()
-                .email("email")
-                .build()));
-        when(accountRepository.findByUserIdAndProviderId(user.getId(),
-                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.of(account));
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(accountRepository.findByUserIdAndProviderId(
+                user.getId(),
+                AuthProvider.CREDENTIALS.toString()
+        )).thenReturn(Optional.of(account));
+        when(rbacService.findAllRoles(
+                RoleFilter.builder()
+                        .userId(userId)
+                        .build(), Pageable.unpaged()
+        )).thenReturn(Page.empty());
+        when(rbacService.findAllPermissions(
+                PermissionFilter.builder()
+                        .userId(userId)
+                        .build(), Pageable.unpaged()
+        )).thenReturn(Page.empty());
+        when(tokenService.generateRefreshToken("test@example.com")).thenReturn("refreshToken");
         var dto = AuthDto.builder()
-                .email("email")
+                .email("test@example.com")
                 .password(password)
                 .provider(AuthProvider.CREDENTIALS)
-                .accountId("email")
+                .accountId("test@example.com")
                 .build();
         AuthenticationResponse result = null;
         try {
@@ -92,8 +110,10 @@ public class AuthServiceUnitTests {
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(User.builder()
                 .email("email")
                 .build()));
-        when(accountRepository.findByUserIdAndProviderId(user.getId(),
-                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.empty());
+        when(accountRepository.findByUserIdAndProviderId(
+                user.getId(),
+                AuthProvider.CREDENTIALS.toString()
+        )).thenReturn(Optional.empty());
         var dto = AuthDto.builder()
                 .email("email")
                 .password("password")
@@ -120,8 +140,10 @@ public class AuthServiceUnitTests {
                 .accountId("email")
                 .build();
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));
-        when(accountRepository.findByUserIdAndProviderId(user.getId(),
-                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.of(account));
+        when(accountRepository.findByUserIdAndProviderId(
+                user.getId(),
+                AuthProvider.CREDENTIALS.toString()
+        )).thenReturn(Optional.of(account));
         var dto = AuthDto.builder()
                 .email("email")
                 .password("password")
@@ -151,8 +173,10 @@ public class AuthServiceUnitTests {
                 .accountId("email")
                 .build();
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));
-        when(accountRepository.findByUserIdAndProviderId(user.getId(),
-                AuthProvider.CREDENTIALS.toString())).thenReturn(Optional.of(account));
+        when(accountRepository.findByUserIdAndProviderId(
+                user.getId(),
+                AuthProvider.CREDENTIALS.toString()
+        )).thenReturn(Optional.of(account));
         var dto = AuthDto.builder()
                 .email("email")
                 .password("password")

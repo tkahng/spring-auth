@@ -38,6 +38,5 @@ public class AuthDto {
     @NonNull
     private String accountId;
 
-    private boolean emailVerified;
     private OffsetDateTime emailVerifiedAt;
 }

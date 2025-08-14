@@ -107,6 +107,7 @@ public class AuthServiceImpl implements AuthService {
         var permissions = getPermissionNamesByUserId(user.getId());
         var accessToken = jwtService.generateToken(JwtDto.builder()
                 .email(user.getEmail())
+                .userId(user.getId())
                 .roles(roles)
                 .permissions(permissions)
                 .emailVerifiedAt(user.getEmailVerifiedAt())
@@ -117,8 +118,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception {
-        var userAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider()
-                .toString());
+        var userAccount = findUserAccountByEmailAndProviderId(
+                authDto.getEmail(), authDto.getProvider()
+                        .toString()
+        );
         if (userAccount.getUser() == null) {
             throw new Exception("user not found");
         }
@@ -129,8 +132,10 @@ public class AuthServiceImpl implements AuthService {
                 .getPassword_hash() == null) {
             throw new Exception("password not found");
         }
-        if (!passwordService.matches(authDto.getPassword(), userAccount.getAccount()
-                .getPassword_hash())) {
+        if (!passwordService.matches(
+                authDto.getPassword(), userAccount.getAccount()
+                        .getPassword_hash()
+        )) {
             throw new Exception("invalid password");
         }
         return generateToken(userAccount.getUser());
@@ -138,8 +143,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception {
-        var existingUserAccount = findUserAccountByEmailAndProviderId(authDto.getEmail(), authDto.getProvider()
-                .toString());
+        var existingUserAccount = findUserAccountByEmailAndProviderId(
+                authDto.getEmail(), authDto.getProvider()
+                        .toString()
+        );
 
         // check if credentials account already exists
         // if it does, throw error
@@ -185,9 +192,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<String> getRoleNamesByUserId(UUID userId) {
-        return rbacService.findAllRoles(RoleFilter.builder()
-                        .userId(userId)
-                        .build(), Pageable.unpaged())
+        return rbacService.findAllRoles(
+                        RoleFilter.builder()
+                                .userId(userId)
+                                .build(), Pageable.unpaged()
+                )
                 .stream()
                 .map(Role::getName)
                 .toList();
@@ -195,9 +204,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<String> getPermissionNamesByUserId(UUID userId) {
-        return rbacService.findAllPermissions(PermissionFilter.builder()
-                        .userId(userId)
-                        .build(), Pageable.unpaged())
+        return rbacService.findAllPermissions(
+                        PermissionFilter.builder()
+                                .userId(userId)
+                                .build(), Pageable.unpaged()
+                )
                 .stream()
                 .map(Permission::getName)
                 .toList();
