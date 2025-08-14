@@ -41,7 +41,6 @@ public class ProtectedControllerTests {
     private JwtService jwtService;
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper; // for JSON parsing
 
@@ -50,20 +49,54 @@ public class ProtectedControllerTests {
     @Rollback
     public void testBasicSuccess() throws Exception {
         testProtectedEndpoint("basic", "basic", false);
+    }
 
+    @Test
+    @Rollback
+    public void testProBasicSuccess() throws Exception {
+        testProtectedEndpoint("pro", "basic", false);
     }
 
     @Test
     @Rollback
     public void testProSuccess() throws Exception {
         testProtectedEndpoint("pro", "pro", false);
+    }
 
+    @Test
+    @Rollback
+    public void testAdvancedBasicSuccess() throws Exception {
+        testProtectedEndpoint("advanced", "basic", false);
+    }
+
+    @Test
+    @Rollback
+    public void testAdvancedProSuccess() throws Exception {
+        testProtectedEndpoint("advanced", "pro", false);
     }
 
     @Test
     @Rollback
     public void testAdvancedSuccess() throws Exception {
         testProtectedEndpoint("advanced", "advanced", false);
+    }
+
+    @Test
+    @Rollback
+    public void testAdminBasicSuccess() throws Exception {
+        testProtectedEndpoint("admin", "basic", false);
+    }
+
+    @Test
+    @Rollback
+    public void testAdminProSuccess() throws Exception {
+        testProtectedEndpoint("admin", "pro", false);
+    }
+
+    @Test
+    @Rollback
+    public void testAdminAdvancedSuccess() throws Exception {
+        testProtectedEndpoint("admin", "advanced", false);
     }
 
     @Test
@@ -116,8 +149,8 @@ public class ProtectedControllerTests {
                 .provider(AuthProvider.CREDENTIALS)
                 .build());
         var role = rbacService.findOrCreateRoleByName(roleName);
-        var permission = rbacService.findOrCreatePermissionByName(roleName);
-        rbacService.assignPermissionToRole(role, permission);
+        //var permission = rbacService.findOrCreatePermissionByName(roleName);
+        //rbacService.assignPermissionToRole(role, permission);
         rbacService.assignRoleToUser(user.getUser(), role);
         return user.getUser();
     }
