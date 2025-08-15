@@ -1,12 +1,14 @@
 package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.Token;
+import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.CreateTokenDto;
 import com.tkahng.spring_auth.repository.TokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -79,5 +81,24 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String validateEmailVerificationToken(String token) throws IllegalArgumentException {
         return validate(token, TOKEN_TYPE_EMAIL_VERIFICATION);
+    }
+
+    private String getText(User user, String verificationId) {
+        String encodedVerificationId = new String(Base64.getEncoder()
+                .encode(verificationId.getBytes()));
+
+        return "Dear " +
+                user.getEmail() +
+                "," +
+                System.lineSeparator() +
+                System.lineSeparator() +
+                "Your account has been successfully created in the Course Tracker application. " +
+                "Activate your account by clicking the following link: http://localhost:8080/verify/email?id=" +
+                encodedVerificationId +
+                System.lineSeparator() +
+                System.lineSeparator() +
+                "Regards," +
+                System.lineSeparator() +
+                "Course Tracker Team";
     }
 }
