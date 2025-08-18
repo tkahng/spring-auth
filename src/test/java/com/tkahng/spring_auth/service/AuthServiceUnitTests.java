@@ -216,7 +216,12 @@ public class AuthServiceUnitTests {
         // Step 2: Parse URI and extract token
         URI uri = new URI(url);
         String query = uri.getQuery(); // e.g. token=some+random+token+with+spaces%26symbols%21
-        assertThat(query).isEqualTo("some+random+token+with+spaces%26symbols%21");
+        String token = null;
+        String[] pair = query.split("=", 2);
+        if (pair.length == 2 && pair[0].equals("token")) {
+            token = pair[1];
+        }
+        assertThat(token).isEqualTo(original);
     }
 
 }
