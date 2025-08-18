@@ -1,10 +1,8 @@
 package com.tkahng.spring_auth.service;
 
 
+import com.tkahng.spring_auth.dto.EmailDto;
+
 public interface MailService {
-
-    void sendSimpleMail(String to, String subject, String content);
-
-    void sendHtmlMail(String to, String subject, String content);
-
+    void sendMail(EmailDto notificationEmail) throws Exception;
 }

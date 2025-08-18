@@ -22,7 +22,38 @@ public class AuthServiceImpl implements AuthService {
     private final AccountRepository accountRepository;
     private final RbacService rbacService;
     private final TokenService tokenService;
-
+    //private final MailService mailService;
+    //@Value("${app.url:http://localhost:8080}")
+    //private String baseUrl;
+    //
+    //public void sendVerificationMail(User user) throws Exception {
+    //    var token = tokenService.generateEmailVerificationToken(user.getEmail());
+    //    var link = buildVerificationUrl(token);
+    //    var mailContent = buildVerificationMail(link);
+    //    var dto = EmailDto.builder()
+    //            .subject("Confirm your email")
+    //            .body(mailContent)
+    //            .recipient(user.getEmail())
+    //            .build();
+    //
+    //    mailService.sendMail(dto);
+    //}
+    //
+    //private String buildVerificationUrl(String token) {
+    //    return UriComponentsBuilder.fromUriString(baseUrl) // recommended instead of fromHttpUrl
+    //            .path("/api/auth/confirm-verification")
+    //            .queryParam("token", token)
+    //            .build()
+    //            .toUriString();
+    //}
+    //
+    //private String buildVerificationMail(String verificationLink) {
+    //    return """
+    //            <h2>Confirm your email</h2>
+    //            <p>Follow this link to confirm your email:</p>
+    //            <p><a href="%s">Confirm your email address</a></p>
+    //            """.formatted(verificationLink);
+    //}
 
     @Override
     public Optional<User> findUserByEmail(String email) {

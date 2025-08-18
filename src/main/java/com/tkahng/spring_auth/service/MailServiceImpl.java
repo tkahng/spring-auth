@@ -1,16 +1,15 @@
 package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.dto.EmailDto;
-import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 @Slf4j
@@ -19,6 +18,9 @@ public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${app.url:http://localhost:8080}")
+    private String baseUrl;
+
     @Value("${spring.mail.username}")
     private String from;
 
@@ -26,14 +28,30 @@ public class MailServiceImpl implements MailService {
         this.mailSender = mailSender;
     }
 
+    public String buildVerificationUrl(String token) {
+        return UriComponentsBuilder.fromUriString(baseUrl) // recommended instead of fromHttpUrl
+                .path("/api/auth/confirm-verification")
+                .queryParam("token", token)
+                .build()
+                .toUriString();
+    }
+
+    public String sendVerificationMail(String token) {
+        return """
+                <h2>Confirm your email</h2>
+                <p>Follow this link to confirm your email:</p>
+                <p><a href="%s">Confirm your email address</a></p>
+                """.formatted(token);
+    }
+
     @Async
-    void sendMail(EmailDto notificationEmail) throws Exception {
+    public void sendMail(EmailDto notificationEmail) throws Exception {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-            messageHelper.setFrom("springreddit@email.com");
+            messageHelper.setFrom(from);
             messageHelper.setTo(notificationEmail.getRecipient());
             messageHelper.setSubject(notificationEmail.getSubject());
-            messageHelper.setText(notificationEmail.getBody());
+            messageHelper.setText(notificationEmail.getBody(), true);
         };
         try {
             mailSender.send(messagePreparator);
@@ -44,41 +62,4 @@ public class MailServiceImpl implements MailService {
                     "Exception occurred when sending mail to " + notificationEmail.getRecipient(), e);
         }
     }
-
-    @Override
-    public void sendSimpleMail(String to, String subject, String content) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(content);
-
-        try {
-            mailSender.send(message);
-            log.info("simple mail sent successfully");
-        } catch (Exception e) {
-            log.error("error sending simple mail, ", e);
-        }
-
-    }
-
-    @Override
-    public void sendHtmlMail(String to, String subject, String content) {
-        MimeMessage message = mailSender.createMimeMessage();
-
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(from);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(content, true);
-
-            mailSender.send(message);
-            log.info("html mail sent successfully");
-        } catch (Exception e) {
-            log.error("error sending html mail, ", e);
-        }
-    }
-
-
 }
