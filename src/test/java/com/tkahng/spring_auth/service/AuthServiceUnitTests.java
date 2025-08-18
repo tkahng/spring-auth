@@ -40,6 +40,11 @@ public class AuthServiceUnitTests {
     private RbacService rbacService;
     @MockitoBean
     private TokenService tokenService;
+    //@MockitoBean
+    //private JavaMailSender mailSender;
+
+    //@Autowired
+    //private MailServiceImpl mailService;
 
     @Test
     public void testLoginSuccess() {
