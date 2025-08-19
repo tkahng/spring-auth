@@ -89,6 +89,9 @@ public interface AuthService {
 
     AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception;
 
+    AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) throws Exception;
+
+
     AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception;
 
     void handleEmailVerification(String token) throws Exception;
@@ -99,5 +102,5 @@ public interface AuthService {
 
     List<String> getPermissionNamesByUserId(UUID userId);
 
-    
+
 }

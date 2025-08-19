@@ -78,7 +78,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserAccount signupNewUser(@NotNull AuthDto authDto) throws Exception {
         UserAccount userAndAccount = createUserAndAccount(authDto);
-        mailService.sendVerificationMail(userAndAccount.getUser());
+        if (authDto.getEmailVerifiedAt() == null) {
+            mailService.sendVerificationMail(userAndAccount.getUser());
+        }
         return userAndAccount;
     }
 
@@ -150,6 +152,30 @@ public class AuthServiceImpl implements AuthService {
         // create account
         return generateToken(newUserAccount.getUser());
 
+    }
+
+    @Override
+    public AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) throws Exception {
+        var existingUserAccount = findUserAccountByEmailAndProviderId(
+                authDto.getEmail(), authDto.getProvider()
+                        .toString()
+        );
+
+        // check if credentials account already exists
+        // if it does, throw error
+        if (existingUserAccount.getAccount() != null) {
+            throw new Exception("user account already exists. please login");
+        }
+        UserAccount newUserAccount;
+        // if user does not exist, this is a new signup.
+        if (existingUserAccount.getUser() == null) {
+            newUserAccount = signupNewUser(authDto);
+        } else {
+            // if user exists, link account
+            newUserAccount = linkAccount(authDto, existingUserAccount.getUser());
+        }
+        // create account
+        return generateToken(newUserAccount.getUser());
     }
 
     @Override
