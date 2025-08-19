@@ -46,7 +46,7 @@ public class CustomUserDetail implements UserDetails, CredentialsContainer {
         if (this.account == null) {
             return null;
         }
-        return this.account.getPassword_hash();
+        return this.account.getPasswordHash();
     }
 
     @Override

@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -43,8 +42,8 @@ public class Account {
     private String providerId;
     @Column(nullable = false)
     private String accountId;
-    @Column(nullable = true)
-    private String password_hash;
+    @Column(nullable = true, name = "password_hash")
+    private String passwordHash;
     @Column(nullable = true)
     private String refreshToken;
     @Column(nullable = true)
@@ -63,11 +62,9 @@ public class Account {
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    @ColumnDefault("now()")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    @ColumnDefault("now()")
     private LocalDateTime updatedAt;
 }

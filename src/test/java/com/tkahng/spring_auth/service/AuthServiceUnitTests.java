@@ -55,7 +55,7 @@ public class AuthServiceUnitTests {
                 .user(user)
                 .providerId(AuthProvider.CREDENTIALS.toString())
                 .accountId("test@example.com")
-                .password_hash(hashedPassword)
+                .passwordHash(hashedPassword)
                 .build();
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(accountRepository.findByUserIdAndProviderId(
@@ -174,7 +174,7 @@ public class AuthServiceUnitTests {
         var account = Account.builder()
                 .user(user)
                 .providerId(AuthProvider.CREDENTIALS.toString())
-                .password_hash(wrongHashedPassword)
+                .passwordHash(wrongHashedPassword)
                 .accountId("email")
                 .build();
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));

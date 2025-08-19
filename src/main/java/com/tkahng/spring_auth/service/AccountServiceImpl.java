@@ -42,8 +42,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public int updatePasswordById(UUID id, String passwordHash) {
-        return 0;
-        //return accountRepository.updatePasswordById(id, passwordHash);
+        return accountRepository.updatePasswordById(id, passwordHash);
     }
 
 }

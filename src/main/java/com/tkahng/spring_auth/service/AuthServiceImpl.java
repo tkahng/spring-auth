@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         if (authDto.getPassword() != null) {
             var hashedPassword = passwordService.encode(authDto.getPassword());
-            account.setPassword_hash(hashedPassword);
+            account.setPasswordHash(hashedPassword);
         }
         return accountService.createAccount(account);
     }
@@ -117,12 +117,12 @@ public class AuthServiceImpl implements AuthService {
             throw new Exception("user account not found");
         }
         if (userAccount.getAccount()
-                .getPassword_hash() == null) {
+                .getPasswordHash() == null) {
             throw new Exception("password not found");
         }
         if (!passwordService.matches(
                 authDto.getPassword(), userAccount.getAccount()
-                        .getPassword_hash()
+                        .getPasswordHash()
         )) {
             throw new Exception("invalid password");
         }
