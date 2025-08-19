@@ -14,12 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
@@ -201,32 +197,5 @@ public class AuthServiceUnitTests {
         }
     }
 
-    @Test
-    public void testEmailRegex() throws URISyntaxException {
-        var original = "some+random+token+with+spaces&symbols!";
-        String html = """
-                <h2>Confirm your email</h2>
-                <p>Follow this link to confirm your email:</p>
-                <p><a href="https://playground.k2dv.io/api/auth/confirm-verification?token=some+random+token+with+spaces%26symbols%21">Confirm your email address</a></p>
-                """;
-
-        // Step 1: Extract the href attribute with regex (simple approach)
-        Pattern pattern = Pattern.compile("href\\s*=\\s*\"([^\"]+)\"");
-        Matcher matcher = pattern.matcher(html);
-        if (!matcher.find()) {
-            throw new RuntimeException("No link found in HTML");
-        }
-        String url = matcher.group(1);
-
-        // Step 2: Parse URI and extract token
-        URI uri = new URI(url);
-        String query = uri.getQuery(); // e.g. token=some+random+token+with+spaces%26symbols%21
-        String token = null;
-        String[] pair = query.split("=", 2);
-        if (pair.length == 2 && pair[0].equals("token")) {
-            token = pair[1];
-        }
-        assertThat(token).isEqualTo(original);
-    }
 
 }

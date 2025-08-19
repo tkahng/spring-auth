@@ -7,8 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,5 +57,24 @@ public class MailSenderStub implements MailSender {
      */
     public void clear() {
         sentEmails.clear();
+    }
+
+    public String getLinkParam(String html, String paramName) throws URISyntaxException {
+        Pattern pattern = Pattern.compile("href\\s*=\\s*\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(html);
+        if (!matcher.find()) {
+            throw new RuntimeException("No link found in HTML");
+        }
+        String url = matcher.group(1);
+
+        // Step 2: Parse URI and extract token
+        URI uri = new URI(url);
+        String query = uri.getQuery(); // e.g. token=some+random+token+with+spaces%26symbols%21
+        String token = null;
+        String[] pair = query.split("=", 2);
+        if (pair.length == 2 && pair[0].equals(paramName)) {
+            token = pair[1];
+        }
+        return token;
     }
 }

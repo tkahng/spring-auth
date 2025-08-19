@@ -54,6 +54,6 @@ public class AuthController {
 
     @PostMapping("/confirm-verification/{token}")
     public void confirmVerificationPost(@PathVariable String token) throws Exception {
-        
+        authService.handleEmailVerification(token);
     }
 }

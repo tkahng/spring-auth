@@ -6,9 +6,11 @@ import com.tkahng.spring_auth.dto.CreateTokenDto;
 import com.tkahng.spring_auth.repository.TokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,12 +39,17 @@ public class TokenServiceImpl implements TokenService {
         return token.getValue();
     }
 
+    @Transactional
+    public Optional<Token> findByValueAndTypeAndExpiresAfter(String value, String type, OffsetDateTime expiresAt) {
+        return tokenRepository.findByValueAndTypeAndExpiresAfter(value, type, expiresAt);
+    }
+
     @Override
     public String validate(String value, String type) throws IllegalArgumentException {
-        var result = tokenRepository.findByValueAndTypeAndExpiresAfter(value, type, OffsetDateTime.now())
+        var result = findByValueAndTypeAndExpiresAfter(value, type, OffsetDateTime.now())
                 .orElse(null);
         if (result == null) {
-            throw new IllegalArgumentException("Invalid refresh token");
+            throw new IllegalArgumentException("Invalid token. ");
         }
         var identifier = result.getIdentifier();
         tokenRepository.deleteById(result.getId());

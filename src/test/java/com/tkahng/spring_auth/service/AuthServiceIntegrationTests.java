@@ -7,8 +7,6 @@ import com.tkahng.spring_auth.dto.PermissionFilter;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,16 +38,6 @@ class AuthServiceIntegrationTests {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
-    void setUp() {
-//        flyway.clean();
-//        flyway.migrate();
-    }
-
-    @AfterEach
-    void tearDown() {
-
-    }
 
     @Test
     @Rollback
@@ -92,25 +80,4 @@ class AuthServiceIntegrationTests {
         assertThat(permission).contains("admin");
     }
 
-    //@Test
-    //@Rollback
-    //public void testUpdateUserEmailVerifiedAt() {
-    //    User userA = User.builder()
-    //            .email("test+01@example.com")
-    //            .build();
-    //    underTest.saveAndFlush(userA);
-    //    User userB = User.builder()
-    //            .email("test+02@example.com")
-    //            .build();
-    //    underTest.saveAndFlush(userB);
-    //    assertThat(userA.getEmailVerifiedAt()).isNull();
-    //    assertThat(userB.getEmailVerifiedAt()).isNull();
-    //    underTest.updateEmailVerifiedAt(userA.getId(), OffsetDateTime.now());
-    //    userA = underTest.findById(userA.getId())
-    //            .orElseThrow();
-    //    userB = underTest.findById(userB.getId())
-    //            .orElseThrow();
-    //    assertThat(userA.getEmailVerifiedAt()).isNotNull();
-    //    assertThat(userB.getEmailVerifiedAt()).isNull();
-    //}
 }
