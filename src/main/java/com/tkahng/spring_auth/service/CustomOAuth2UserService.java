@@ -27,16 +27,9 @@
 //        String name = oAuth2User.getAttribute("name");
 //        String picture = oAuth2User.getAttribute("picture");
 //        // 🔹 Find or create user in your DB
-//        User user = userRepository.findByEmail(email)
-//                .orElseGet(() -> {
-//                    User newUser = new User();
-//                    newUser.setEmail(email);
-//                    newUser.setName(name);
-//                    newUser.setProvider("GOOGLE");
-//                    return userRepository.save(newUser);
-//                });
+//        //User user =
 //
 //        // You can wrap this in a custom `UserDetails` object if needed
-//        return new CustomUserPrincipal(user, oAuth2User.getAttributes());
+//        return oAuth2User;
 //    }
 //}
