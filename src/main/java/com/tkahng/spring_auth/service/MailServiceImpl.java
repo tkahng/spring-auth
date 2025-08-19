@@ -9,7 +9,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 
 
 @Slf4j
@@ -26,22 +25,6 @@ public class MailServiceImpl implements MailService {
 
     public MailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
-    }
-
-    public String buildVerificationUrl(String token) {
-        return UriComponentsBuilder.fromUriString(baseUrl) // recommended instead of fromHttpUrl
-                .path("/api/auth/confirm-verification")
-                .queryParam("token", token)
-                .build()
-                .toUriString();
-    }
-
-    public String sendVerificationMail(String token) {
-        return """
-                <h2>Confirm your email</h2>
-                <p>Follow this link to confirm your email:</p>
-                <p><a href="%s">Confirm your email address</a></p>
-                """.formatted(token);
     }
 
     @Async
