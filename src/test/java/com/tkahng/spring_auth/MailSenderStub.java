@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth;
 
 import com.tkahng.spring_auth.dto.EmailDto;
-import com.tkahng.spring_auth.service.MailService;
+import com.tkahng.spring_auth.service.MailSender;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Primary
-public class MailServiceStub implements MailService {
+public class MailSenderStub implements MailSender {
 
     @Getter
     private final List<EmailDto> sentEmails = new ArrayList<>();

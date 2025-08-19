@@ -22,7 +22,9 @@ public class AuthServiceImpl implements AuthService {
     private final AccountRepository accountRepository;
     private final RbacService rbacService;
     private final TokenService tokenService;
-    //private final MailService mailService;
+    private final MailService mailService;
+    //private final MailSender mailService;
+    //
     //@Value("${app.url:http://localhost:8080}")
     //private String baseUrl;
     //
@@ -123,8 +125,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserAccount signupNewUser(@NotNull AuthDto authDto) {
-        return createUserAndAccount(authDto);
+    public UserAccount signupNewUser(@NotNull AuthDto authDto) throws Exception {
+        UserAccount userAndAccount = createUserAndAccount(authDto);
+        mailService.sendVerificationMail(userAndAccount.getUser());
+        return userAndAccount;
     }
 
     @Override

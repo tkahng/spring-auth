@@ -47,22 +47,25 @@ public interface AuthService {
      * @param authDto authDto
      * @return UserAccount
      */
-    UserAccount signupNewUser(@NotNull AuthDto authDto);
+    UserAccount signupNewUser(@NotNull AuthDto authDto) throws Exception;
 
 
     /**
      * this method is called during account linking, where an existing user signs up with an account provider,
      * such as a user who already signed up with email and password signing up with a social media account.
-     * during signup, if a user with the same email already exists, we should consider them the same user and link their accounts,
+     * during signup, if a user with the same email already exists, we should consider them the same user and link
+     * their accounts,
      * allowing them to sign in whichever way they prefer. however, the following points must be considered:
      * <p>
      * 1. if the incoming account email is not verified, we should not link the account.
      * for example, if a user signs up with Google, and another signs up with email and password using the same email,
      * we should not link the accounts as they might not be the same user, and throw an error.
      * <p>
-     * 2. if the incoming account email is verified, but the existing user is not verified, we should reset the credentials of the existing account.
+     * 2. if the incoming account email is verified, but the existing user is not verified, we should reset the
+     * credentials of the existing account.
      * for example, if a user signs up with email and password, and another signs up with Google using the same email,
-     * the original user may be set as verified, even thought they are not the same user, and we should reset the password and send an email asking them to reset their password.
+     * the original user may be set as verified, even thought they are not the same user, and we should reset the
+     * password and send an email asking them to reset their password.
      * <p>
      * 3. if the incoming account email is verified, and the existing user is verified, we should link the accounts.
      * for example, if a user signs up with email and password, and another signs up with Google using the same email,

@@ -36,7 +36,6 @@ public class AuthControllerIntegrationTests {
     private AuthService authService;
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper; // for JSON parsing
 
@@ -61,9 +60,10 @@ public class AuthControllerIntegrationTests {
                 .andReturn();
 
         AuthenticationResponse authResponse =
-                objectMapper.readValue(loginResult.getResponse()
-                                .getContentAsString(),
-                        AuthenticationResponse.class);
+                objectMapper.readValue(
+                        loginResult.getResponse()
+                                .getContentAsString(), AuthenticationResponse.class
+                );
 
         String accessToken = authResponse.getAccessToken();
         assertThat(accessToken).isNotBlank();
