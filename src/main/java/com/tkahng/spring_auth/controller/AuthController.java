@@ -56,4 +56,9 @@ public class AuthController {
     public void confirmVerificationPost(@PathVariable String token) throws Exception {
         authService.handleEmailVerification(token);
     }
+
+    @GetMapping("/confirm-verification/{token}")
+    public void confirmVerificationGet(@PathVariable String token) throws Exception {
+        authService.handleEmailVerification(token);
+    }
 }

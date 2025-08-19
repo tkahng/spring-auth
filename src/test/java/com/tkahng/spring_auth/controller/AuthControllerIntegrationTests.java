@@ -8,6 +8,7 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
 import com.tkahng.spring_auth.service.AuthService;
 import com.tkahng.spring_auth.service.UserService;
+import io.swagger.v3.oas.models.PathItem;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,6 +146,18 @@ public class AuthControllerIntegrationTests {
     @Rollback
     public void confirmVerificationPost() throws Exception {
         // 1. Sign up first (or login if user already exists)
+        extracted(PathItem.HttpMethod.POST);
+    }
+
+    @Test
+    @Rollback
+    public void confirmVerificationGet() throws Exception {
+        // 1. Sign up first (or login if user already exists)
+        extracted(PathItem.HttpMethod.GET);
+    }
+
+
+    private void extracted(PathItem.HttpMethod method) throws Exception {
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -158,10 +171,16 @@ public class AuthControllerIntegrationTests {
         assertThat(token).isNotNull()
                 .isNotBlank()
                 .isNotEmpty();
-        mockMvc.perform(post("/api/auth/confirm-verification/" + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk());
+        switch (method) {
+            case GET -> mockMvc.perform(get("/api/auth/confirm-verification/" + token)
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andExpect(status().isOk());
+            case POST -> mockMvc.perform(post("/api/auth/confirm-verification/" + token)
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andExpect(status().isOk());
+        }
         var user = userService.findUserByEmail("test@example.com")
                 .orElseThrow();
         assertThat(user.getEmailVerifiedAt()).isNotNull();
