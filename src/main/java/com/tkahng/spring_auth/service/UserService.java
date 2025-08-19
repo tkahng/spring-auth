@@ -13,5 +13,7 @@ public interface UserService {
 
     Optional<User> findUserByEmail(String email);
 
+    Optional<User> findUserById(UUID userId);
+
     User createUser(@NotNull AuthDto authDto);
 }

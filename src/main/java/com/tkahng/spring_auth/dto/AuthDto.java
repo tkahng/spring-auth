@@ -21,6 +21,8 @@ public class AuthDto {
      */
     private String password;
 
+    private String hashedPassword;
+
     /**
      * name of the user. optional.
      */

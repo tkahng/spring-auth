@@ -2,8 +2,6 @@ package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.*;
 import com.tkahng.spring_auth.dto.*;
-import com.tkahng.spring_auth.repository.AccountRepository;
-import com.tkahng.spring_auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +17,7 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final PasswordService passwordService;
-    private final UserRepository userRepository;
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final RbacService rbacService;
     private final TokenService tokenService;
     private final MailService mailService;
@@ -29,13 +26,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserAccount findUserAccountByEmailAndProviderId(String email, String providerId) {
         var userAccount = new UserAccount();
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userService.findUserByEmail(email);
         if (user.isEmpty()) {
             return userAccount;
         }
         var userDetail = user.get();
         userAccount.setUser(userDetail);
-        Optional<Account> account = accountRepository.findByUserIdAndProviderId(userDetail.getId(), providerId);
+        Optional<Account> account = accountService.findByUserIdAndProviderId(userDetail.getId(), providerId);
         if (account.isEmpty()) {
             return userAccount;
         }
@@ -59,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
             var hashedPassword = passwordService.encode(authDto.getPassword());
             account.setPassword_hash(hashedPassword);
         }
-        return accountRepository.saveAndFlush(account);
+        return accountService.createAccount(account);
     }
 
 

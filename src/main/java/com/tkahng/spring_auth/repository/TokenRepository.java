@@ -4,6 +4,7 @@ import com.tkahng.spring_auth.domain.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -15,5 +16,6 @@ public interface TokenRepository extends JpaRepository<Token, UUID>, JpaSpecific
 
     Optional<Token> findByValueAndTypeAndExpiresAfter(String value, String type, OffsetDateTime expiresAt);
 
+    @Transactional
     void deleteByValue(String value);
 }

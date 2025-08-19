@@ -25,6 +25,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public Optional<User> findUserById(UUID userId) {
+        return userRepository.findById(userId);
+    }
+
+    @Override
+    @Transactional
     public User createUser(@NotNull AuthDto authDto) {
         var user = User.builder()
                 .email(authDto.getEmail())
