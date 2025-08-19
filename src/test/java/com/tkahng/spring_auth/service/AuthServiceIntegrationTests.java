@@ -34,6 +34,8 @@ class AuthServiceIntegrationTests {
     @Autowired
     private AuthService authService;
     @Autowired
+    private UserService userService;
+    @Autowired
     private RbacService rbacService;
     @Autowired
     private UserRepository userRepository;
@@ -60,7 +62,7 @@ class AuthServiceIntegrationTests {
                 .build();
         var res = authService.signup(dto);
         assertThat(res).isNotNull();
-        var user = authService.findUserByEmail("email")
+        var user = userService.findUserByEmail("email")
                 .orElseThrow();
         assertThat(user).isNotNull()
                 .matches(user1 -> user.getEmail()
@@ -73,7 +75,7 @@ class AuthServiceIntegrationTests {
     public void testCreateSuperUser() throws Exception {
         rbacService.initRolesAndPermissions();
         authService.createSuperUser("email", "password");
-        var user = authService.findUserByEmail("email")
+        var user = userService.findUserByEmail("email")
                 .orElseThrow();
         assertThat(user).isNotNull()
                 .matches(user1 -> user.getEmail()
@@ -89,4 +91,26 @@ class AuthServiceIntegrationTests {
                 .toList();
         assertThat(permission).contains("admin");
     }
+
+    //@Test
+    //@Rollback
+    //public void testUpdateUserEmailVerifiedAt() {
+    //    User userA = User.builder()
+    //            .email("test+01@example.com")
+    //            .build();
+    //    underTest.saveAndFlush(userA);
+    //    User userB = User.builder()
+    //            .email("test+02@example.com")
+    //            .build();
+    //    underTest.saveAndFlush(userB);
+    //    assertThat(userA.getEmailVerifiedAt()).isNull();
+    //    assertThat(userB.getEmailVerifiedAt()).isNull();
+    //    underTest.updateEmailVerifiedAt(userA.getId(), OffsetDateTime.now());
+    //    userA = underTest.findById(userA.getId())
+    //            .orElseThrow();
+    //    userB = underTest.findById(userB.getId())
+    //            .orElseThrow();
+    //    assertThat(userA.getEmailVerifiedAt()).isNotNull();
+    //    assertThat(userB.getEmailVerifiedAt()).isNull();
+    //}
 }

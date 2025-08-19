@@ -23,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
     private final RbacService rbacService;
     private final TokenService tokenService;
     private final MailService mailService;
+    private final UserService userService;
     //private final MailSender mailService;
     //
     //@Value("${app.url:http://localhost:8080}")
@@ -57,10 +58,10 @@ public class AuthServiceImpl implements AuthService {
     //            """.formatted(verificationLink);
     //}
 
-    @Override
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+    //@Override
+    //public Optional<User> findUserByEmail(String email) {
+    //    return userRepository.findByEmail(email);
+    //}
 
     @Override
     public UserAccount findUserAccountByEmailAndProviderId(String email, String providerId) {
@@ -80,15 +81,15 @@ public class AuthServiceImpl implements AuthService {
         return userAccount;
     }
 
-    @Override
-    public User createUser(@NotNull AuthDto authDto) {
-        var user = User.builder()
-                .email(authDto.getEmail())
-                .name(authDto.getName())
-                .emailVerifiedAt(authDto.getEmailVerifiedAt())
-                .build();
-        return userRepository.saveAndFlush(user);
-    }
+    //@Override
+    //public User createUser(@NotNull AuthDto authDto) {
+    //    var user = User.builder()
+    //            .email(authDto.getEmail())
+    //            .name(authDto.getName())
+    //            .emailVerifiedAt(authDto.getEmailVerifiedAt())
+    //            .build();
+    //    return userRepository.saveAndFlush(user);
+    //}
 
 
     @Override
@@ -111,7 +112,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserAccount createUserAndAccount(@NotNull AuthDto authDto) {
-        var user = createUser(authDto);
+        var user = userService.createUser(authDto);
         return createAccountFromUser(authDto, user);
     }
 
@@ -204,9 +205,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception {
         var identifier = tokenService.validateRefreshToken(refreshToken);
-        var user = findUserByEmail(identifier)
+        var user = userService.findUserByEmail(identifier)
                 .orElseThrow(() -> new Exception("user not found"));
         return generateToken(user);
+    }
+
+    @Override
+    public void handleEmailVerification(String token) throws Exception {
+        var identifier = tokenService.validateEmailVerificationToken(token);
+        var user = userService.findUserByEmail(identifier)
+                .orElseThrow(() -> new Exception("user not found"));
+
     }
 
     @Override

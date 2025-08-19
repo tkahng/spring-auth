@@ -1,6 +1,7 @@
 package com.tkahng.spring_auth.command;
 
 import com.tkahng.spring_auth.service.AuthService;
+import com.tkahng.spring_auth.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class SuperUserCommand implements CommandLineRunner {
     private final AuthService authService;
+    private final UserService userService;
 
     @Override
     public void run(String... args) {
@@ -19,12 +21,12 @@ public class SuperUserCommand implements CommandLineRunner {
         }
         String email = args[0];
         String password = args[1];
-        var existingSuperUser = authService.findUserByEmail(email);
+        var existingSuperUser = userService.findUserByEmail(email);
         if (existingSuperUser.isPresent()) {
             System.out.println("Super user already exists with email: " + email);
             return;
         }
-        
+
 
         System.out.println("Super user created: " + email);
     }

@@ -6,6 +6,7 @@ import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
 import com.tkahng.spring_auth.service.AuthService;
+import com.tkahng.spring_auth.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerIntegrationTests {
     @Autowired
     private AuthService authService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -84,7 +87,7 @@ public class AuthControllerIntegrationTests {
     @Rollback
     public void refreshToken() throws Exception {
         // 1. Sign up first (or login if user already exists)
-        var user = authService.createUser(AuthDto.builder()
+        var user = userService.createUser(AuthDto.builder()
                 .email("test@example.com")
                 .provider(AuthProvider.CREDENTIALS)
                 .accountId("test@example.com")

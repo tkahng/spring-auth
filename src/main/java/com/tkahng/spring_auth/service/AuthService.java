@@ -8,16 +8,15 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface AuthService {
     // CRUD Methods -------------------------------------------------------------
-    Optional<User> findUserByEmail(String email);
+    //Optional<User> findUserByEmail(String email);
 
     UserAccount findUserAccountByEmailAndProviderId(String email, String providerId);
 
-    User createUser(@NotNull AuthDto authDto);
+    //User createUser(@NotNull AuthDto authDto);
 
     Account createAccount(@NotNull AuthDto authDto, User user);
 
@@ -91,6 +90,8 @@ public interface AuthService {
     AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception;
 
     AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception;
+
+    void handleEmailVerification(String token) throws Exception;
 
     void createSuperUser(String email, String password) throws Exception;
 

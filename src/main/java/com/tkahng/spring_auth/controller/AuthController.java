@@ -51,4 +51,9 @@ public class AuthController {
     public AuthenticationResponse refreshToken(@RequestBody @NotNull RefreshTokenRequest request) throws Exception {
         return authService.handleRefreshToken(request.getRefreshToken());
     }
+
+    @PostMapping("/confirm-verification/{token}")
+    public void confirmVerificationPost(@PathVariable String token) throws Exception {
+        
+    }
 }

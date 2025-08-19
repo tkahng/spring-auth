@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,7 +32,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = true)
+    @Column(nullable = true, name = "email_verified_at")
     private OffsetDateTime emailVerifiedAt;
 
     @Column(nullable = true)
@@ -41,12 +40,10 @@ public class User {
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    @ColumnDefault("now()")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    @ColumnDefault("now()")
     private LocalDateTime updatedAt;
 
 }

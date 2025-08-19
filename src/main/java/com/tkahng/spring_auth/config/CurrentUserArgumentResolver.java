@@ -3,6 +3,7 @@ package com.tkahng.spring_auth.config;
 
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.service.AuthService;
+import com.tkahng.spring_auth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -34,13 +36,14 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public Object resolveArgument(
             @NotNull MethodParameter parameter, ModelAndViewContainer mavContainer,
-            @NotNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+            @NotNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory
+    ) {
         var authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
         if (authentication instanceof JwtAuthenticationToken jwtAuth) {
             Jwt jwt = jwtAuth.getToken();
             String subject = jwt.getSubject();
-            return authService.findUserByEmail(subject)
+            return userService.findUserByEmail(subject)
                     .orElseThrow(() -> new RuntimeException("User not found"));
         }
         return null;
