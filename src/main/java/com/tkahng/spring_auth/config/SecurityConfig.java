@@ -29,6 +29,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity // enables @PreAuthorize, @PostAuthorize, @Secured, etc.
@@ -113,7 +115,8 @@ public class SecurityConfig {
                                         .decoder(jwtDecoder(secretKey()))
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                );
+                )
+                .oauth2Login(withDefaults());
 
         return http.build();
     }

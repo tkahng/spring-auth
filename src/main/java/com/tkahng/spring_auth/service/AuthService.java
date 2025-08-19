@@ -98,4 +98,6 @@ public interface AuthService {
     List<String> getRoleNamesByUserId(UUID userId);
 
     List<String> getPermissionNamesByUserId(UUID userId);
+
+    
 }
