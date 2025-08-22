@@ -1,6 +1,9 @@
 package com.tkahng.spring_auth.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.tkahng.spring_auth.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.tkahng.spring_auth.security.oauth2.OAuth2LoginSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,12 +35,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity // enables @PreAuthorize, @PostAuthorize, @Secured, etc.
 public class SecurityConfig {
+    @Autowired
+    private OAuth2LoginSuccessHandler successHandler;
+
     @Value("${jwt.key}")
     private String jwtKey;
 
@@ -123,9 +127,17 @@ public class SecurityConfig {
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .oauth2Login(withDefaults());
+                .oauth2Login(auth -> auth.authorizationEndpoint(
+                                ae -> ae.authorizationRequestRepository(cookieAuthorizationRequestRepository()))
+                        .successHandler(successHandler)
+                );
 
         return http.build();
+    }
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
     @Bean

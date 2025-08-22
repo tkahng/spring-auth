@@ -1,9 +1,11 @@
-//package com.tkahng.spring_auth.service;
+//package com.tkahng.spring_auth.security.oauth2;
 //
 //import com.tkahng.spring_auth.dto.AuthDto;
 //import com.tkahng.spring_auth.dto.AuthProvider;
 //import com.tkahng.spring_auth.security.oauth2.user.OAuth2UserInfo;
 //import com.tkahng.spring_auth.security.oauth2.user.OAuth2UserInfoFactory;
+//import com.tkahng.spring_auth.service.AuthService;
+//import org.springframework.security.oauth2.client.registration.ClientRegistration;
 //import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 //import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 //import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -22,6 +24,10 @@
 //
 //    @Override
 //    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+//        ClientRegistration.ProviderDetails providerDetails = userRequest.getClientRegistration()
+//                .getProviderDetails();
+//        String userNameAttributeName = providerDetails.getUserInfoEndpoint()
+//                .getUserNameAttributeName();
 //        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 //        OAuth2User oAuth2User = delegate.loadUser(userRequest);
 //        AuthProvider provider = AuthProvider.fromString(userRequest.getClientRegistration()
