@@ -2,6 +2,7 @@ package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.dto.JwtDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -23,8 +24,10 @@ public class JwtServiceImpl implements JwtService {
                 .issuer("your-app")
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(3600))
-                .subject(dto.getEmail())
-                .claim("user_id", dto.getUserId());
+                .subject(dto.getUserId()
+                        .toString())
+                .claim("user_id", dto.getUserId())
+                .claim(StandardClaimNames.EMAIL, dto.getEmail());
 
         ArrayList<String> authorities = new ArrayList<>();
         var roles = dto.getRoles();

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -27,10 +28,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        var type = parameter.getParameterType()
+        return parameter.getParameterType()
                 .equals(User.class);
-        log.info("type: {}", type);
-        return type;
     }
 
     @Override
@@ -42,7 +41,10 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
                 .getAuthentication();
         if (authentication instanceof JwtAuthenticationToken jwtAuth) {
             Jwt jwt = jwtAuth.getToken();
-            String subject = jwt.getSubject();
+            String subject = jwt.getClaimAsString(StandardClaimNames.EMAIL);
+            if (subject == null) {
+                throw new RuntimeException("Subject not found");
+            }
             return userService.findUserByEmail(subject)
                     .orElseThrow(() -> new RuntimeException("User not found"));
         }
