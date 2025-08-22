@@ -1,6 +1,9 @@
 package com.tkahng.spring_auth.service;
 
+import com.tkahng.spring_auth.domain.Token;
 import com.tkahng.spring_auth.dto.CreateTokenDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TokenService {
     /**
@@ -29,4 +32,8 @@ public interface TokenService {
     String generatePasswordResetToken(String identifier);
 
     String validatePasswordResetToken(String token);
+
+    int deleteByIdentifierAndType(String identifier, String type);
+
+    Page<Token> findByIdentifier(String identifier, Pageable pageable);
 }

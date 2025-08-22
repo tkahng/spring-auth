@@ -4,6 +4,8 @@ import com.tkahng.spring_auth.domain.Token;
 import com.tkahng.spring_auth.dto.CreateTokenDto;
 import com.tkahng.spring_auth.repository.TokenRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,5 +103,16 @@ public class TokenServiceImpl implements TokenService {
         return validate(token, TOKEN_TYPE_PASSWORD_RESET);
     }
 
+    @Override
+    @Transactional
+    public int deleteByIdentifierAndType(String identifier, String type) {
+        return tokenRepository.deleteByIdentifierAndType(identifier, type);
+    }
 
+
+    @Override
+    @Transactional
+    public Page<Token> findByIdentifier(String identifier, Pageable pageable) {
+        return tokenRepository.findByIdentifier(identifier, pageable);
+    }
 }

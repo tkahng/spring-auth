@@ -1,6 +1,8 @@
 package com.tkahng.spring_auth.repository;
 
 import com.tkahng.spring_auth.domain.Token;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -18,4 +20,8 @@ public interface TokenRepository extends JpaRepository<Token, UUID>, JpaSpecific
 
     @Transactional
     void deleteByValue(String value);
+
+    int deleteByIdentifierAndType(String identifier, String type);
+
+    Page<Token> findByIdentifier(String identifier, Pageable pageable);
 }
