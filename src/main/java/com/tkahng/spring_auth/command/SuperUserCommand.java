@@ -26,7 +26,7 @@ public class SuperUserCommand implements CommandLineRunner {
             System.out.println("Super user already exists with email: " + email);
             return;
         }
-
+        authService.createSuperUser(email, password);
 
         System.out.println("Super user created: " + email);
     }

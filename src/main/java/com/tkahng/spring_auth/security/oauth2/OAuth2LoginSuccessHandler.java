@@ -8,7 +8,6 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.security.oauth2.user.OAuth2UserInfoFactory;
 import com.tkahng.spring_auth.service.AuthService;
 import com.tkahng.spring_auth.util.CookieUtils;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,7 +46,7 @@ public class OAuth2LoginSuccessHandler
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication
-    ) throws IOException, ServletException {
+    ) throws IOException {
         if (!(authentication instanceof OAuth2AuthenticationToken auth)) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unsupported authentication");
             return;
