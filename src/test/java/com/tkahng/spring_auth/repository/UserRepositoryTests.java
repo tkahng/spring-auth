@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @DataJpaTest
 @EnableJpaAuditing
 @ExtendWith(SpringExtension.class)
@@ -26,6 +29,7 @@ public class UserRepositoryTests {
     }
 
     @Test
+    @Rollback
     public void testThatUserCanBeCreatedAndRecalled() {
         User user = new User();
         user.setName("name1");
@@ -38,6 +42,7 @@ public class UserRepositoryTests {
     }
 
     @Test
+    @Rollback
     public void testThatMultipleUsersCanBeCreatedAndRecalled() {
         User userA = User.builder()
                 .name("namea")

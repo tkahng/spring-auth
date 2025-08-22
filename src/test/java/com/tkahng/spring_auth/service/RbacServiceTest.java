@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 @ExtendWith(SpringExtension.class)
 @Slf4j
@@ -81,9 +83,11 @@ class RbacServiceTest {
         var dto = CreatePermissionDto.builder()
                 .description("test")
                 .build();
-        Assertions.assertThrows(Exception.class, () -> {
-            rbacService.createPermission(dto);
-        });
+        Assertions.assertThrows(
+                Exception.class, () -> {
+                    rbacService.createPermission(dto);
+                }
+        );
     }
 
     @Test
@@ -123,9 +127,11 @@ class RbacServiceTest {
                 .description("test")
                 .build();
 
-        Assertions.assertThrows(Exception.class, () -> {
-            rbacService.createRole(dto);
-        });
+        Assertions.assertThrows(
+                Exception.class, () -> {
+                    rbacService.createRole(dto);
+                }
+        );
     }
 
     @Test
@@ -161,16 +167,20 @@ class RbacServiceTest {
         rbacService.assignPermissionToRole(role2, permission3);
         rbacService.assignPermissionToRole(role, permission3);
         rbacService.assignRoleToUser(user, role2);
-        var allPermissions = rbacService.findAllPermissions(PermissionFilter.builder()
-                        .userId(user.getId())
-                        .build(), Pageable.unpaged())
+        var allPermissions = rbacService.findAllPermissions(
+                        PermissionFilter.builder()
+                                .userId(user.getId())
+                                .build(), Pageable.unpaged()
+                )
                 .getContent();
         assertThat(allPermissions)
                 .hasSize(3)
                 .containsExactly(permission, permission2, permission3);
-        var allRoles = rbacService.findAllRoles(RoleFilter.builder()
-                        .userId(user.getId())
-                        .build(), Pageable.unpaged())
+        var allRoles = rbacService.findAllRoles(
+                        RoleFilter.builder()
+                                .userId(user.getId())
+                                .build(), Pageable.unpaged()
+                )
                 .getContent();
         assertThat(allRoles)
                 .hasSize(2)
@@ -180,12 +190,16 @@ class RbacServiceTest {
     @Test
     void initRolesAndPermissions() {
         rbacService.initRolesAndPermissions();
-        var roles = rbacService.findAllRoles(RoleFilter.builder()
-                .build(), Pageable.unpaged());
+        var roles = rbacService.findAllRoles(
+                RoleFilter.builder()
+                        .build(), Pageable.unpaged()
+        );
         assertThat(roles).isNotNull();
         assertThat(roles.getTotalElements()).isEqualTo(4);
-        var permissions = rbacService.findAllPermissions(PermissionFilter.builder()
-                .build(), Pageable.unpaged());
+        var permissions = rbacService.findAllPermissions(
+                PermissionFilter.builder()
+                        .build(), Pageable.unpaged()
+        );
         assertThat(permissions).isNotNull();
         assertThat(permissions.getTotalElements()).isEqualTo(4);
 
@@ -197,9 +211,11 @@ class RbacServiceTest {
                     .orElseThrow();
             log.info("role {}", role.getName());
             assertThat(role).isNotNull();
-            var rolePermissions = rbacService.findAllPermissions(PermissionFilter.builder()
-                    .roleId(role.getId())
-                    .build(), Pageable.unpaged());
+            var rolePermissions = rbacService.findAllPermissions(
+                    PermissionFilter.builder()
+                            .roleId(role.getId())
+                            .build(), Pageable.unpaged()
+            );
             for (var permission : rolePermissions.get()
                     .toList()) {
                 log.info("role {} permission {}", role.getName(), permission.getName());

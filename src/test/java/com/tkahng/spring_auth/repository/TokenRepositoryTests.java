@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.OffsetDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ActiveProfiles("test")
 @DataJpaTest(showSql = true)
 @EnableJpaAuditing
 @ExtendWith(SpringExtension.class)
@@ -26,6 +29,7 @@ public class TokenRepositoryTests {
     }
 
     @Test
+    @Rollback
     public void testThatTokenExpiredCanBeCreatedAndNotRetrieved() {
         var token = Token.builder()
                 .identifier("identifier2")
@@ -42,6 +46,7 @@ public class TokenRepositoryTests {
     }
 
     @Test
+    @Rollback
     public void testThatTokenNotExpiredCanBeCreatedAndRetrieved() {
         var token = Token.builder()
                 .identifier("identifier")
@@ -57,6 +62,7 @@ public class TokenRepositoryTests {
     }
 
     @Test
+    @Rollback
     public void testThatTokenCanBeDeletedByValue() {
         var token = Token.builder()
                 .identifier("identifier3")
@@ -69,8 +75,10 @@ public class TokenRepositoryTests {
         var retrievedToken = tokenRepository.findByValueAndTypeAndExpiresAfter("value3", "type", OffsetDateTime.now());
         assertThat(retrievedToken).isPresent();
         tokenRepository.deleteById(token.getId());
-        var retrievedTokenAgain = tokenRepository.findByValueAndTypeAndExpiresAfter("value3", "type",
-                OffsetDateTime.now());
+        var retrievedTokenAgain = tokenRepository.findByValueAndTypeAndExpiresAfter(
+                "value3", "type",
+                OffsetDateTime.now()
+        );
         assertThat(retrievedTokenAgain).isEmpty();
     }
 }

@@ -8,12 +8,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @DataJpaTest(showSql = true)
 @EnableJpaAuditing
 @ExtendWith(SpringExtension.class)
@@ -39,9 +42,13 @@ public class RoleRepositoryTests {
     }
 
     @Test
+    @Rollback
     public void testPaginateByName() {
         var roles = createNumberedRoles(3);
-        var result = roleRepository.findAll((root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + "role".toLowerCase() + "%"), Pageable.unpaged());
+        var result = roleRepository.findAll(
+                (root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + "role".toLowerCase() + "%"),
+                Pageable.unpaged()
+        );
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(3);
 
