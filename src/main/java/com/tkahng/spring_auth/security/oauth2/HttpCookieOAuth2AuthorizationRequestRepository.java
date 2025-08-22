@@ -33,7 +33,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
                 cookieExpireSeconds
         );
         String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
-        if (!redirectUriAfterLogin.isBlank()) {
+        if (redirectUriAfterLogin != null && !redirectUriAfterLogin.isEmpty()) {
             CookieUtils.addCookie(response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds);
         }
     }
@@ -43,7 +43,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        return null;
+        return loadAuthorizationRequest(request);
     }
 
 

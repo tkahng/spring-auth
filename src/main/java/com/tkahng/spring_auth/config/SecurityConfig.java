@@ -1,5 +1,6 @@
 package com.tkahng.spring_auth.config;
 
+import com.tkahng.spring_auth.security.oauth2.CustomOAuth2UserService;
 import com.tkahng.spring_auth.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.tkahng.spring_auth.security.oauth2.OAuth2LoginFailureHandler;
 import com.tkahng.spring_auth.security.oauth2.OAuth2LoginSuccessHandler;
@@ -69,7 +70,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http, JwtDecoder jwtDecoder, OAuth2LoginSuccessHandler successHandler,
-            OAuth2LoginFailureHandler failureHandler
+            OAuth2LoginFailureHandler failureHandler,
+            CustomOAuth2UserService customOAuth2UserService
     ) throws Exception {
         http
                 .sessionManagement(c ->
@@ -89,6 +91,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(auth -> auth.authorizationEndpoint(
                                 ae -> ae.authorizationRequestRepository(cookieAuthorizationRequestRepository()))
+                        .userInfoEndpoint(ue -> ue.userService(customOAuth2UserService))
                         .successHandler(successHandler)
                         .failureHandler(failureHandler)
                 );

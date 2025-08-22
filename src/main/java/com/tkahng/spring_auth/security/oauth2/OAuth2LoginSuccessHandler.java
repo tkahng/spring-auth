@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -28,6 +29,7 @@ import java.time.OffsetDateTime;
 
 import static com.tkahng.spring_auth.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler
@@ -50,6 +52,7 @@ public class OAuth2LoginSuccessHandler
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unsupported authentication");
             return;
         }
+
         String registrationId = auth.getAuthorizedClientRegistrationId();
         AuthProvider provider = AuthProvider.fromString(registrationId);
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(registrationId, auth.getName());
@@ -61,7 +64,6 @@ public class OAuth2LoginSuccessHandler
                 provider, auth.getPrincipal()
                         .getAttributes()
         );
-
         var accessToken = client.getAccessToken()
                 .getTokenValue();
         var refreshToken = client.getRefreshToken() != null ? client.getRefreshToken()
@@ -81,6 +83,7 @@ public class OAuth2LoginSuccessHandler
             res = authService.oauth2Login(dto);
             respond(request, response, res);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

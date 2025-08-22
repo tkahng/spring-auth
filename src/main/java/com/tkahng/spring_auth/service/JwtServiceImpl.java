@@ -44,7 +44,9 @@ public class JwtServiceImpl implements JwtService {
         }
         if (dto.getEmailVerifiedAt() != null) {
             authorities.add("email_verified");
-            claims.claim("email_verified_at", dto.getEmailVerifiedAt());
+            claims.claim("email_verified_at", dto.getEmailVerifiedAt()
+                    .toString()
+            );
         }
         if (!authorities.isEmpty()) {
             claims.claim("authorities", authorities);
