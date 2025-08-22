@@ -25,7 +25,7 @@ public class AuthController {
                 .provider(AuthProvider.CREDENTIALS)
                 .accountId(request.getEmail())
                 .build();
-        return authService.signup(authDto);
+        return authService.credentialsSignup(authDto);
     }
 
     @PostMapping("/login")
@@ -36,7 +36,7 @@ public class AuthController {
                 .provider(AuthProvider.CREDENTIALS)
                 .accountId(request.getEmail())
                 .build();
-        return authService.login(authDto);
+        return authService.credentialsLogin(authDto);
     }
 
     @GetMapping("/me")

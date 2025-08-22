@@ -85,9 +85,9 @@ public interface AuthService {
      */
     AuthenticationResponse generateToken(@NotNull User user) throws Exception;
 
-    AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception;
+    AuthenticationResponse credentialsLogin(@NotNull AuthDto authDto) throws Exception;
 
-    AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception;
+    AuthenticationResponse credentialsSignup(@NotNull AuthDto authDto) throws Exception;
 
     AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) throws Exception;
 

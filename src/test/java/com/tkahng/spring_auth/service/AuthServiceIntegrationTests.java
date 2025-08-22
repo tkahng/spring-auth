@@ -48,7 +48,7 @@ class AuthServiceIntegrationTests {
                 .provider(AuthProvider.CREDENTIALS)
                 .accountId("email")
                 .build();
-        var res = authService.signup(dto);
+        var res = authService.credentialsSignup(dto);
         assertThat(res).isNotNull();
         var user = userService.findUserByEmail("email")
                 .orElseThrow();

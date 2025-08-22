@@ -43,7 +43,7 @@ public class AuthServiceUnitTests {
     //private MailServiceImpl mailService;
 
     @Test
-    public void testLoginSuccess() {
+    public void testCredentialsLoginSuccess() {
         var userId = UUID.randomUUID();
         var user = User.builder()
                 .id(userId)
@@ -81,7 +81,7 @@ public class AuthServiceUnitTests {
                 .build();
         AuthenticationResponse result = null;
         try {
-            result = authService.login(dto);
+            result = authService.credentialsLogin(dto);
         } catch (Exception e) {
 
         }
@@ -89,7 +89,7 @@ public class AuthServiceUnitTests {
     }
 
     @Test
-    public void testLoginFailUserNotFound() {
+    public void testCredentialsLoginFailUserNotFound() {
         when(userRepository.findByEmail("email")).thenReturn(Optional.empty());
         var dto = AuthDto.builder()
                 .email("email")
@@ -99,7 +99,7 @@ public class AuthServiceUnitTests {
                 .build();
         AuthenticationResponse result = null;
         try {
-            result = authService.login(dto);
+            result = authService.credentialsLogin(dto);
         } catch (Exception e) {
             assertThat(e.getMessage())
                     .contains("user not found");
@@ -107,7 +107,7 @@ public class AuthServiceUnitTests {
     }
 
     @Test
-    public void testLoginFailUserAccountNotFound() {
+    public void testCredentialsLoginFailUserAccountNotFound() {
         var user = User.builder()
                 .email("email")
                 .build();
@@ -127,7 +127,7 @@ public class AuthServiceUnitTests {
                 .build();
         AuthenticationResponse result = null;
         try {
-            result = authService.login(dto);
+            result = authService.credentialsLogin(dto);
         } catch (Exception e) {
             assertThat(e.getMessage())
                     .contains("user account not found");
@@ -135,7 +135,7 @@ public class AuthServiceUnitTests {
     }
 
     @Test
-    public void testLoginFailUserAccountPasswordNull() {
+    public void testCredentialsLoginFailUserAccountPasswordNull() {
         var user = User.builder()
                 .email("email")
                 .build();
@@ -157,7 +157,7 @@ public class AuthServiceUnitTests {
                 .build();
         AuthenticationResponse result = null;
         try {
-            result = authService.login(dto);
+            result = authService.credentialsLogin(dto);
         } catch (Exception e) {
             assertThat(e.getMessage())
                     .contains("password not found");
@@ -165,7 +165,7 @@ public class AuthServiceUnitTests {
     }
 
     @Test
-    public void testLoginFailUserAccountPasswordNotMatch() {
+    public void testCredentialsLoginFailUserAccountPasswordNotMatch() {
         var user = User.builder()
                 .email("email")
                 .build();
@@ -190,7 +190,7 @@ public class AuthServiceUnitTests {
                 .build();
         AuthenticationResponse result = null;
         try {
-            result = authService.login(dto);
+            result = authService.credentialsLogin(dto);
         } catch (Exception e) {
             assertThat(e.getMessage())
                     .contains("invalid password");

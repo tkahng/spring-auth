@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse login(@NotNull AuthDto authDto) throws Exception {
+    public AuthenticationResponse credentialsLogin(@NotNull AuthDto authDto) throws Exception {
         var userAccount = findUserAccountByEmailAndProviderId(
                 authDto.getEmail(), authDto.getProvider()
                         .toString()
@@ -130,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse signup(@NotNull AuthDto authDto) throws Exception {
+    public AuthenticationResponse credentialsSignup(@NotNull AuthDto authDto) throws Exception {
         var existingUserAccount = findUserAccountByEmailAndProviderId(
                 authDto.getEmail(), authDto.getProvider()
                         .toString()
