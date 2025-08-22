@@ -18,6 +18,8 @@ public interface TokenRepository extends JpaRepository<Token, UUID>, JpaSpecific
 
     Optional<Token> findByValueAndTypeAndExpiresAfter(String value, String type, OffsetDateTime expiresAt);
 
+    Optional<Token> findByValue(String value);
+
     @Transactional
     void deleteByValue(String value);
 

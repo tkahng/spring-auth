@@ -5,6 +5,8 @@ import com.tkahng.spring_auth.dto.CreateTokenDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public interface TokenService {
     /**
      * @param createTokenDto tokenDto
@@ -36,4 +38,6 @@ public interface TokenService {
     int deleteByIdentifierAndType(String identifier, String type);
 
     Page<Token> findByIdentifier(String identifier, Pageable pageable);
+
+    Optional<Token> findByValue(String value);
 }

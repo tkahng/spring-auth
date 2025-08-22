@@ -6,10 +6,8 @@ import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
-import com.tkahng.spring_auth.service.AccountService;
-import com.tkahng.spring_auth.service.AuthService;
-import com.tkahng.spring_auth.service.PasswordService;
-import com.tkahng.spring_auth.service.UserService;
+import com.tkahng.spring_auth.repository.TokenRepository;
+import com.tkahng.spring_auth.service.*;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +51,10 @@ public class AuthControllerIntegrationTests {
     private UserService userService;
     @Autowired
     private MailSenderStub mailSenderStub;
+    @Autowired
+    private TokenService tokenService;
+    @Autowired
+    private TokenRepository tokenRepository;
     @Autowired
     private PasswordService passwordService;
     @Autowired
@@ -164,15 +166,36 @@ public class AuthControllerIntegrationTests {
                         result.getResponse()
                                 .getContentAsString(), AuthenticationResponse.class
                 );
-        var mailContent = mailSenderStub.getEmailsTo("test@example.com")
+        var firstMailContent = mailSenderStub.getEmailsTo("test@example.com")
                 .getFirst();
-        assertThat(mailContent).isNotNull();
-        var token = mailSenderStub.getLinkParam(mailContent.getBody(), "token");
-        assertThat(token).isNotNull()
+        assertThat(firstMailContent).isNotNull();
+        var firstToken = mailSenderStub.getLinkParam(firstMailContent.getBody(), "token");
+        assertThat(firstToken).isNotNull()
+                .isNotBlank()
+                .isNotEmpty();
+        var firstTokenResult = tokenService.findByValue(firstToken)
+                .orElseThrow();
+        assertThat(firstTokenResult).isNotNull();
+        mailSenderStub.remove(firstMailContent);
+        mockMvc.perform(
+                        post("/api/auth/request-verification")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + authResponse.getAccessToken()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+
+                )
+                .andExpect(status().isOk());
+        var secondMailContent = mailSenderStub.getEmailsTo("test@example.com")
+                .getFirst();
+        assertThat(secondMailContent).isNotNull();
+        var secondToken = mailSenderStub.getLinkParam(secondMailContent.getBody(), "token");
+        assertThat(secondToken).isNotNull()
                 .isNotBlank()
                 .isNotEmpty();
         mockMvc.perform(
-                        post("/api/auth/confirm-verification/" + token)
+                        post("/api/auth/confirm-verification/" + secondToken)
                                 .header(
                                         HttpHeaders.AUTHORIZATION,
                                         "Bearer " + authResponse.getAccessToken()
@@ -183,6 +206,10 @@ public class AuthControllerIntegrationTests {
         var user = userService.findUserByEmail("test@example.com")
                 .orElseThrow();
         assertThat(user.getEmailVerifiedAt()).isNotNull();
+
+        var secondTokenResult = tokenService.findByValue(firstToken)
+                .orElse(null);
+        assertThat(secondTokenResult).isNull();
     }
 
 

@@ -59,6 +59,10 @@ public class MailSenderStub implements MailSender {
         sentEmails.clear();
     }
 
+    public void remove(EmailDto email) {
+        sentEmails.remove(email);
+    }
+
     public String getLinkParam(String html, String paramName) throws URISyntaxException {
         Pattern pattern = Pattern.compile("href\\s*=\\s*\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(html);

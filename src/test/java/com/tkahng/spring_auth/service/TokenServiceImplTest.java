@@ -41,7 +41,7 @@ class TokenServiceImplTest {
         Assertions.assertThat(count)
                 .isEqualTo(2);
 
-        var remaining = tokenRepository.findByIdentifier("id1", Pageable.unpaged())
+        var remaining = tokenService.findByIdentifier("id1", Pageable.unpaged())
                 .getContent()
                 .size();
         Assertions.assertThat(remaining)

@@ -85,6 +85,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateEmailVerificationToken(String identifier) {
+        deleteByIdentifierAndType(identifier, TOKEN_TYPE_EMAIL_VERIFICATION);
         return createToken(identifier, TOKEN_TYPE_EMAIL_VERIFICATION, TOKEN_EMAIL_VERIFICATION_TTL);
     }
 
@@ -95,6 +96,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generatePasswordResetToken(String identifier) {
+        deleteByIdentifierAndType(identifier, TOKEN_TYPE_PASSWORD_RESET);
         return createToken(identifier, TOKEN_TYPE_PASSWORD_RESET, TOKEN_PASSWORD_RESET_TTL);
     }
 
@@ -114,5 +116,11 @@ public class TokenServiceImpl implements TokenService {
     @Transactional
     public Page<Token> findByIdentifier(String identifier, Pageable pageable) {
         return tokenRepository.findByIdentifier(identifier, pageable);
+    }
+
+    @Override
+    @Transactional
+    public Optional<Token> findByValue(String value) {
+        return tokenRepository.findByValue(value);
     }
 }
