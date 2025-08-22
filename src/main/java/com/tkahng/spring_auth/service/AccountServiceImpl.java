@@ -45,4 +45,10 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.updatePasswordById(id, passwordHash);
     }
 
+    @Override
+    @Transactional
+    public int updateRefreshTokenById(UUID id, String refreshToken) {
+        return accountRepository.updateRefreshTokenById(id, refreshToken);
+    }
+
 }

@@ -3,6 +3,7 @@ package com.tkahng.spring_auth.service;
 import com.tkahng.spring_auth.domain.Account;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
+import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,10 @@ class AccountServiceTest {
     private AccountService accountService;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private PasswordService passwordService;
 
     @Test
     @Rollback
@@ -108,4 +113,50 @@ class AccountServiceTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    @Rollback
+    public void testThatAccountPasswordCanBeUpdated() {
+        var user = authService.createUserAndAccount(AuthDto.builder()
+                .email("test@example.com")
+                .name("test")
+                .password("Password123!")
+                .accountId("test")
+                .provider(AuthProvider.CREDENTIALS)
+                .build());
+        var updatedPassword = "updatedPassword";
+        var updatedHashedPassword = passwordService.encode(updatedPassword);
+        accountService.updatePasswordById(
+                user.getAccount()
+                        .getId(), updatedHashedPassword
+        );
+        var account = accountRepository.findByUserIdAndProviderId(
+                        user.getUser()
+                                .getId(), AuthProvider.CREDENTIALS.toString()
+                )
+                .orElseThrow();
+        assertThat(account.getPasswordHash()).isEqualTo(updatedHashedPassword);
+    }
+
+    @Test
+    @Rollback
+    public void testThatAccountRefreshTokenCanBeUpdated() {
+        var user = authService.createUserAndAccount(AuthDto.builder()
+                .email("test@example.com")
+                .name("test")
+                .refreshToken("refreshToken")
+                .accountId("test")
+                .provider(AuthProvider.GOOGLE)
+                .build());
+        var updatedRefreshToken = "updatedRefreshToken";
+        accountService.updateRefreshTokenById(
+                user.getAccount()
+                        .getId(), updatedRefreshToken
+        );
+        var account = accountRepository.findByUserIdAndProviderId(
+                        user.getUser()
+                                .getId(), AuthProvider.GOOGLE.toString()
+                )
+                .orElseThrow();
+        assertThat(account.getRefreshToken()).isEqualTo(updatedRefreshToken);
+    }
 }

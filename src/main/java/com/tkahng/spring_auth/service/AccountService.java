@@ -2,6 +2,7 @@ package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.Account;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +16,8 @@ public interface AccountService {
     Optional<Account> findById(UUID id);
 
     void deleteAccount(Account account);
-    
+
     int updatePasswordById(UUID id, String passwordHash);
+
+    int updateRefreshTokenById(@Param("id") UUID id, @Param("refreshToken") String refreshToken);
 }

@@ -21,4 +21,9 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Transactional
     @Query("UPDATE Account a SET a.passwordHash = :passwordHash WHERE a.id = :id")
     int updatePasswordById(@Param("id") UUID id, @Param("passwordHash") String passwordHash);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("UPDATE Account a SET a.refreshToken = :refreshToken WHERE a.id = :id")
+    int updateRefreshTokenById(@Param("id") UUID id, @Param("refreshToken") String refreshToken);
 }
