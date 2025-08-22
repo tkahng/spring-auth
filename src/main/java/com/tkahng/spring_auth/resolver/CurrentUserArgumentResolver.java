@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.config;
+package com.tkahng.spring_auth.resolver;
 
 
 import com.tkahng.spring_auth.domain.User;
