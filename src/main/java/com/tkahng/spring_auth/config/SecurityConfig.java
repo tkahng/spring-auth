@@ -2,6 +2,7 @@ package com.tkahng.spring_auth.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.tkahng.spring_auth.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.tkahng.spring_auth.security.oauth2.OAuth2LoginFailureHandler;
 import com.tkahng.spring_auth.security.oauth2.OAuth2LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +42,9 @@ import java.util.Base64;
 public class SecurityConfig {
     @Autowired
     private OAuth2LoginSuccessHandler successHandler;
+
+    @Autowired
+    private OAuth2LoginFailureHandler failureHandler;
 
     @Value("${jwt.key}")
     private String jwtKey;
@@ -130,6 +134,7 @@ public class SecurityConfig {
                 .oauth2Login(auth -> auth.authorizationEndpoint(
                                 ae -> ae.authorizationRequestRepository(cookieAuthorizationRequestRepository()))
                         .successHandler(successHandler)
+                        .failureHandler(failureHandler)
                 );
 
         return http.build();
