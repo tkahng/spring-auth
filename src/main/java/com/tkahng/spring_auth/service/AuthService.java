@@ -8,6 +8,8 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.SetPasswordRequest;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public interface AuthService {
     // CRUD Methods -------------------------------------------------------------
     //Optional<User> findUserByEmail(String email);
@@ -91,4 +93,6 @@ public interface AuthService {
     void createSuperUser(String email, String password);
 
     void setPassword(@NotNull User user, @NotNull SetPasswordRequest request);
+
+    void updateAccountPassword(UUID accountId, String password);
 }

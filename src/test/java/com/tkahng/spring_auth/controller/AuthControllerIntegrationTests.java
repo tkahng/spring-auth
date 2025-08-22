@@ -8,6 +8,7 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
 import com.tkahng.spring_auth.service.AccountService;
 import com.tkahng.spring_auth.service.AuthService;
+import com.tkahng.spring_auth.service.PasswordService;
 import com.tkahng.spring_auth.service.UserService;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.*;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +53,8 @@ public class AuthControllerIntegrationTests {
     private UserService userService;
     @Autowired
     private MailSenderStub mailSenderStub;
+    @Autowired
+    private PasswordService passwordService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -229,4 +233,55 @@ public class AuthControllerIntegrationTests {
         assertThat(account.getProviderId()).isEqualTo(AuthProvider.CREDENTIALS.toString());
     }
 
+    @Test
+    @DisplayName("Reset password")
+    @Rollback
+    public void testResetPassword() throws Exception {
+        var oldPassword = "Password123!";
+        var newPassword = "NewPassword123!";
+        var user = authService.createUserAndAccount(new AuthDto()
+                .setEmailVerifiedAt(OffsetDateTime.now())
+                .setAccountId("test@example.com")
+                .setPassword(oldPassword)
+                .setEmail("test@example.com")
+                .setProvider(AuthProvider.CREDENTIALS));
+        var authResponse = authService.generateToken(user.getUser());
+        String accessToken = authResponse.getAccessToken();
+        mockMvc.perform(
+                        post("/api/auth/request-password-reset")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + authResponse.getAccessToken()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                            { "email": "test@example.com" }
+                                        """)
+                )
+                .andExpect(status().isOk());
+        var mailContent = mailSenderStub.getEmailsTo("test@example.com")
+                .getFirst();
+        assertThat(mailContent).isNotNull();
+        var token = mailSenderStub.getLinkParam(mailContent.getBody(), "token");
+        assertThat(token).isNotNull()
+                .isNotBlank()
+                .isNotEmpty();
+
+        mockMvc.perform(
+                        post("/api/auth/confirm-password-reset/" + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                            { "password": "%s", "confirmPassword": "%s" }
+                                        """.formatted(newPassword, newPassword))
+                )
+                .andExpect(status().isOk());
+        var account = accountService.findByUserIdAndProviderId(
+                        user.getUser()
+                                .getId(), AuthProvider.CREDENTIALS.toString()
+                )
+                .orElse(null);
+        Assertions.assertNotNull(account);
+        var matches = passwordService.matches(newPassword, account.getPasswordHash());
+        assertThat(matches).isTrue();
+    }
 }

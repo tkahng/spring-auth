@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
     private final MailService mailService;
     private final UserService userService;
 
-    private static Account updateAccount(@NotNull AuthDto authDto, Account existingUserAccount) {
+    private static void updateAccount(@NotNull AuthDto authDto, Account existingUserAccount) {
 
         if (authDto.getRefreshToken() != null) {
             existingUserAccount.setRefreshToken(authDto.getRefreshToken());
@@ -39,7 +40,6 @@ public class AuthServiceImpl implements AuthService {
         if (authDto.getIdToken() != null) {
             existingUserAccount.setIdToken(authDto.getIdToken());
         }
-        return existingUserAccount;
     }
 
     @Override
@@ -238,5 +238,14 @@ public class AuthServiceImpl implements AuthService {
                         .setProvider(AuthProvider.CREDENTIALS)
                         .setAccountId(user.getEmail()), user
         );
+    }
+
+    @Override
+    public void updateAccountPassword(UUID accountId, String password) {
+        var hashedPassword = passwordService.encode(password);
+        var rowsUpdated = accountService.updatePasswordById(accountId, hashedPassword);
+        if (rowsUpdated == 0) {
+            throw new IllegalStateException("no accounts were updated");
+        }
     }
 }

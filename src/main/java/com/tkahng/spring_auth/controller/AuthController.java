@@ -5,10 +5,7 @@ import com.tkahng.spring_auth.annotation.Authenticated;
 import com.tkahng.spring_auth.annotation.CurrentUser;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.*;
-import com.tkahng.spring_auth.service.AuthService;
-import com.tkahng.spring_auth.service.MailService;
-import com.tkahng.spring_auth.service.TokenService;
-import com.tkahng.spring_auth.service.UserService;
+import com.tkahng.spring_auth.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +21,7 @@ public class AuthController {
     private final MailService mailService;
     private final TokenService tokenService;
     private final UserService userService;
+    private final AccountService accountService;
 
     @PostMapping("/signup")
     public AuthenticationResponse signup(@RequestBody @NotNull RegisterRequest request) {
@@ -85,6 +83,7 @@ public class AuthController {
         userService.updateUserEmailVerifiedAt(user.getId(), OffsetDateTime.now());
     }
 
+    @Authenticated
     @PostMapping("/set-password")
     public void setPassword(@CurrentUser User user, @RequestBody @NotNull SetPasswordRequest request) {
         authService.setPassword(user, request);
@@ -92,6 +91,32 @@ public class AuthController {
 
     @PostMapping("/request-password-reset")
     public void requestPasswordReset(@RequestBody @NotNull RequestPasswordResetRequest request) {
-        //authService.requestPasswordReset(request.getEmail());
+        var userAccount = authService.findUserAccountByEmailAndProviderId(
+                request.getEmail(), AuthProvider.CREDENTIALS.toString());
+        if (userAccount.getUser() == null) {
+            throw new EntityNotFoundException("user not found");
+        }
+        if (userAccount.getAccount() == null) {
+            throw new EntityNotFoundException("user account not found");
+        }
+        mailService.sendResetPasswordMail(userAccount.getUser());
+    }
+
+    @PostMapping("/confirm-password-reset/{token}")
+    public void confirmPasswordReset(
+            @PathVariable String token, @RequestBody @NotNull ConfirmPasswordResetRequest request) {
+        var identifier = tokenService.validatePasswordResetToken(token);
+        var userAccount = authService.findUserAccountByEmailAndProviderId(
+                identifier, AuthProvider.CREDENTIALS.toString());
+        if (userAccount.getUser() == null) {
+            throw new EntityNotFoundException("user not found");
+        }
+        if (userAccount.getAccount() == null) {
+            throw new EntityNotFoundException("user account not found");
+        }
+        authService.updateAccountPassword(
+                userAccount.getAccount()
+                        .getId(), request.getPassword()
+        );
     }
 }
