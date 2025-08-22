@@ -13,15 +13,14 @@ public interface TokenService {
      * @param token token value
      * @param type  type
      * @return identifier of user, email.
-     * @throws IllegalArgumentException if token is invalid
      */
-    String validate(String token, String type) throws IllegalArgumentException;
+    String validate(String token, String type);
 
     String generateRefreshToken(String identifier);
 
-    String validateRefreshToken(String refreshToken) throws IllegalArgumentException;
+    String validateRefreshToken(String refreshToken);
 
     String generateEmailVerificationToken(String identifier);
 
-    String validateEmailVerificationToken(String token) throws IllegalArgumentException;
+    String validateEmailVerificationToken(String token);
 }

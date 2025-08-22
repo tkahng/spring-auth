@@ -45,7 +45,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String validate(String value, String type) throws IllegalArgumentException {
+    public String validate(String value, String type) {
         var result = findByValueAndTypeAndExpiresAfter(value, type, OffsetDateTime.now())
                 .orElse(null);
         if (result == null) {
@@ -69,7 +69,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String validateRefreshToken(String refreshToken) throws IllegalArgumentException {
+    public String validateRefreshToken(String refreshToken) {
         return validate(refreshToken, TOKEN_REFRESH_TYPE);
     }
 
@@ -86,7 +86,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String validateEmailVerificationToken(String token) throws IllegalArgumentException {
+    public String validateEmailVerificationToken(String token) {
         return validate(token, TOKEN_TYPE_EMAIL_VERIFICATION);
     }
 

@@ -203,4 +203,14 @@ public class AuthControllerIntegrationTests {
         String token2 = mailSenderStub.getLinkParam(html, "token");
         assertThat(token2).isEqualTo(original);
     }
+
+    @Test
+    @Rollback
+    public void testSetPassword() {
+        var user = authService.createUserAndAccount(new AuthDto().
+                setAccountId("test@example.com")
+                .setEmail("test@example.com")
+                .setProvider(AuthProvider.GOOGLE));
+        var authResponse = authService.generateToken(user.getUser());
+    }
 }

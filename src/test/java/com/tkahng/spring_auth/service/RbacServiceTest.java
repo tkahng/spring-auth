@@ -188,6 +188,7 @@ class RbacServiceTest {
     }
 
     @Test
+    @Rollback
     void initRolesAndPermissions() {
         rbacService.initRolesAndPermissions();
         var roles = rbacService.findAllRoles(

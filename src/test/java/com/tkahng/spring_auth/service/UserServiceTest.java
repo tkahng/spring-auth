@@ -72,16 +72,5 @@ class UserServiceTest {
         assertThat(userA2.getEmailVerifiedAt()).isNotNull();
         assertThat(userB2.getEmailVerifiedAt()).isNull();
     }
-
-    @Test
-    void findUserByEmail() {
-    }
-
-    @Test
-    void createUser() {
-    }
-
-    @Test
-    void updateUserEmailVerifiedAt() {
-    }
+    
 }

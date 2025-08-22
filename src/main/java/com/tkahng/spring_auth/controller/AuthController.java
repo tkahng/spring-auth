@@ -61,4 +61,9 @@ public class AuthController {
     public void confirmVerificationGet(@PathVariable String token) throws Exception {
         authService.handleEmailVerification(token);
     }
+
+    @PostMapping("/set-password")
+    public void setPassword(@CurrentUser User user, @RequestBody @NotNull SetPasswordRequest request) {
+        authService.setPassword(user, request);
+    }
 }

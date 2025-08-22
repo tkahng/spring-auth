@@ -16,7 +16,7 @@ public class MailServiceImpl implements MailService {
     private String baseUrl;
 
     @Override
-    public void sendVerificationMail(User user) throws Exception {
+    public void sendVerificationMail(User user) {
         var token = tokenService.generateEmailVerificationToken(user.getEmail());
         var link = buildVerificationUrl(token);
         var mailContent = buildVerificationMail(link);

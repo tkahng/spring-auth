@@ -5,6 +5,7 @@ import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
+import com.tkahng.spring_auth.dto.SetPasswordRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public interface AuthService {
      * @param authDto authDto
      * @return UserAccount
      */
-    UserAccount signupNewUser(@NotNull AuthDto authDto) throws Exception;
+    UserAccount signupNewUser(@NotNull AuthDto authDto);
 
 
     /**
@@ -81,26 +82,25 @@ public interface AuthService {
      *
      * @param user user
      * @return AuthenticationResponse
-     * @throws Exception exception
      */
-    AuthenticationResponse generateToken(@NotNull User user) throws Exception;
+    AuthenticationResponse generateToken(@NotNull User user);
 
-    AuthenticationResponse credentialsLogin(@NotNull AuthDto authDto) throws Exception;
+    AuthenticationResponse credentialsLogin(@NotNull AuthDto authDto);
 
-    AuthenticationResponse credentialsSignup(@NotNull AuthDto authDto) throws Exception;
+    AuthenticationResponse credentialsSignup(@NotNull AuthDto authDto);
 
-    AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) throws Exception;
+    AuthenticationResponse oauth2Login(@NotNull AuthDto authDto);
 
 
-    AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception;
+    AuthenticationResponse handleRefreshToken(String refreshToken);
 
-    void handleEmailVerification(String token) throws Exception;
+    void handleEmailVerification(String token);
 
-    void createSuperUser(String email, String password) throws Exception;
+    void createSuperUser(String email, String password);
 
     List<String> getRoleNamesByUserId(UUID userId);
 
     List<String> getPermissionNamesByUserId(UUID userId);
 
-
+    void setPassword(@NotNull User user, @NotNull SetPasswordRequest request);
 }

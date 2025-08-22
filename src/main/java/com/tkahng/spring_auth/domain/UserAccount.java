@@ -4,7 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Accessors(chain = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,4 +17,5 @@ import lombok.NoArgsConstructor;
 public class UserAccount {
     private User user;
     private Account account;
+    private List<Account> accounts = new ArrayList<>();
 }

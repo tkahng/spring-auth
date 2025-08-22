@@ -2,6 +2,8 @@ package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.*;
 import com.tkahng.spring_auth.dto.*;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
@@ -81,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserAccount signupNewUser(@NotNull AuthDto authDto) throws Exception {
+    public UserAccount signupNewUser(@NotNull AuthDto authDto) {
         UserAccount userAndAccount = createUserAndAccount(authDto);
         if (authDto.getEmailVerifiedAt() == null) {
             mailService.sendVerificationMail(userAndAccount.getUser());
@@ -95,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse generateToken(@NotNull User user) throws Exception {
+    public AuthenticationResponse generateToken(@NotNull User user) {
         var roles = getRoleNamesByUserId(user.getId());
         var permissions = getPermissionNamesByUserId(user.getId());
         var accessToken = jwtService.generateToken(JwtDto.builder()
@@ -110,32 +112,32 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse credentialsLogin(@NotNull AuthDto authDto) throws Exception {
+    public AuthenticationResponse credentialsLogin(@NotNull AuthDto authDto) {
         var userAccount = findUserAccountByEmailAndProviderId(
                 authDto.getEmail(), authDto.getProvider()
                         .toString()
         );
         if (userAccount.getUser() == null) {
-            throw new Exception("user not found");
+            throw new IllegalStateException("user not found");
         }
         if (userAccount.getAccount() == null) {
-            throw new Exception("user account not found");
+            throw new IllegalStateException("user account not found");
         }
         if (userAccount.getAccount()
                 .getPasswordHash() == null) {
-            throw new Exception("password not found");
+            throw new IllegalStateException("password not found");
         }
         if (!passwordService.matches(
                 authDto.getPassword(), userAccount.getAccount()
                         .getPasswordHash()
         )) {
-            throw new Exception("invalid password");
+            throw new IllegalArgumentException("invalid password");
         }
         return generateToken(userAccount.getUser());
     }
 
     @Override
-    public AuthenticationResponse credentialsSignup(@NotNull AuthDto authDto) throws Exception {
+    public AuthenticationResponse credentialsSignup(@NotNull AuthDto authDto) {
         var existingUserAccount = findUserAccountByEmailAndProviderId(
                 authDto.getEmail(), authDto.getProvider()
                         .toString()
@@ -144,7 +146,7 @@ public class AuthServiceImpl implements AuthService {
         // check if credentials account already exists
         // if it does, throw error
         if (existingUserAccount.getAccount() != null) {
-            throw new Exception("user account already exists. please login");
+            throw new EntityExistsException("user account already exists. please login");
         }
         UserAccount newUserAccount;
         // if user does not exist, this is a new signup.
@@ -160,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) throws Exception {
+    public AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) {
         var existingUserAccount = findUserAccountByEmailAndProviderId(
                 authDto.getEmail(), authDto.getProvider()
                         .toString()
@@ -169,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
         // check if credentials account already exists
         // if it does, throw error
         if (existingUserAccount.getAccount() != null) {
-            throw new Exception("user account already exists. please login");
+            throw new EntityExistsException("user account already exists. please login");
         }
         UserAccount newUserAccount;
         // if user does not exist, this is a new signup.
@@ -184,26 +186,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse handleRefreshToken(String refreshToken) throws Exception {
+    public AuthenticationResponse handleRefreshToken(String refreshToken) {
         var identifier = tokenService.validateRefreshToken(refreshToken);
         var user = userService.findUserByEmail(identifier)
-                .orElseThrow(() -> new Exception("user not found"));
+                .orElseThrow(() -> new EntityNotFoundException("user not found"));
         return generateToken(user);
     }
 
     @Override
-    public void handleEmailVerification(String token) throws Exception {
+    public void handleEmailVerification(String token) {
         var identifier = tokenService.validateEmailVerificationToken(token);
         var user = userService.findUserByEmail(identifier)
-                .orElseThrow(() -> new Exception("user not found"));
+                .orElseThrow(() -> new EntityNotFoundException("user not found"));
         userService.updateUserEmailVerifiedAt(user.getId(), OffsetDateTime.now());
     }
 
     @Override
-    public void createSuperUser(String email, String password) throws Exception {
+    public void createSuperUser(String email, String password) {
         var existingUserAccount = findUserAccountByEmailAndProviderId(email, AuthProvider.CREDENTIALS.toString());
         if (existingUserAccount.getUser() != null) {
-            throw new Exception("user already exists");
+            throw new EntityExistsException("user already exists");
         }
         var userAccount = createUserAndAccount(AuthDto.builder()
                 .email(email)
@@ -239,4 +241,18 @@ public class AuthServiceImpl implements AuthService {
                 .toList();
     }
 
+    @Override
+    public void setPassword(@NotNull User user, @NotNull SetPasswordRequest request) {
+        var userAccount = accountService.findByUserIdAndProviderId(user.getId(), AuthProvider.CREDENTIALS.toString())
+                .orElse(null);
+        if (userAccount != null) {
+            throw new IllegalStateException("cannot set password on existing credentials account");
+        }
+        createAccountFromUser(
+                new AuthDto().setPassword(request.getPassword())
+                        .setEmail(user.getEmail())
+                        .setProvider(AuthProvider.CREDENTIALS)
+                        .setAccountId(user.getEmail()), user
+        );
+    }
 }

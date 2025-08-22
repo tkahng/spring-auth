@@ -81,5 +81,4 @@ class AuthServiceIntegrationTests {
                 .toList();
         assertThat(permission).contains("admin");
     }
-
 }

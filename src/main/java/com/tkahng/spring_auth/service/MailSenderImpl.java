@@ -24,7 +24,7 @@ public class MailSenderImpl implements MailSender {
     }
 
     @Override
-    public void sendMail(EmailDto notificationEmail) throws Exception {
+    public void sendMail(EmailDto notificationEmail) throws RuntimeException {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setFrom(from);
@@ -37,7 +37,7 @@ public class MailSenderImpl implements MailSender {
             log.info("Activation email sent!!");
         } catch (MailException e) {
             log.error("Exception occurred when sending mail", e);
-            throw new Exception(
+            throw new RuntimeException(
                     "Exception occurred when sending mail to " + notificationEmail.getRecipient(), e);
         }
     }
