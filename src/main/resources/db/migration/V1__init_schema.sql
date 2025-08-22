@@ -94,13 +94,6 @@ create table if not exists public.accounts (
     token_type text,
     created_at timestamptz default clock_timestamp(),
     updated_at timestamptz default clock_timestamp(),
-    -- compound unique constraint on user_id and provider
---     constraint accounts_type_identifier_token_not_empty check (
---         char_length(type) > 0
---         and char_length(identifier) > 0
---         and char_length(token) > 0
---     ),
-    -- constraint accounts_user_id_type_provider_account_id_not_empty check ("user_id", type, provider, "provider_account_id"),
     constraint accounts_provider_provider_account_id_unique unique (provider_id, account_id),
     constraint accounts_user_id_provider_unique unique ("user_id", provider_id)
 );
