@@ -1,33 +1,44 @@
 //package com.tkahng.spring_auth.service;
 //
+//import com.tkahng.spring_auth.dto.AuthDto;
+//import com.tkahng.spring_auth.dto.AuthProvider;
+//import com.tkahng.spring_auth.security.oauth2.user.OAuth2UserInfo;
+//import com.tkahng.spring_auth.security.oauth2.user.OAuth2UserInfoFactory;
 //import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 //import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 //import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+//import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 //import org.springframework.security.oauth2.core.user.OAuth2User;
 //import org.springframework.stereotype.Service;
 //
 //@Service
 //public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 //
-//    private final AuthService userRepository;
+//    private final AuthService authService;
 //
-//    public CustomOAuth2UserService(AuthService userRepository) {
-//        this.userRepository = userRepository;
+//    public CustomOAuth2UserService(AuthService authService) {
+//        this.authService = authService;
 //    }
 //
 //    @Override
-//    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
+//    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 //        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 //        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+//        AuthProvider provider = AuthProvider.fromString(userRequest.getClientRegistration()
+//                .getRegistrationId());
+//        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
+//                provider, oAuth2User.getAttributes()
+//        );
+//        if (oAuth2UserInfo.getEmail() == null) {
+//            throw new OAuth2AuthenticationException("email not found from OAuth2 provider");
+//        }
+//        var authDto = new AuthDto()
+//                .setImage(oAuth2UserInfo.getImageUrl())
+//                .setProvider(provider)
+//                .setAccountId(oAuth2UserInfo.getId())
+//                .setName(oAuth2UserInfo.getName())
+//                .setEmail(oAuth2UserInfo.getEmail());
 //
-//        String providerId = userRequest.getClientRegistration()
-//                .getRegistrationId(); // "google"
-//        String googleId = oAuth2User.getAttribute("sub"); // Google's unique ID
-//        String email = oAuth2User.getAttribute("email");
-//        String name = oAuth2User.getAttribute("name");
-//        String picture = oAuth2User.getAttribute("picture");
-//        // 🔹 Find or create user in your DB
-//        //User user =
 //
 //        // You can wrap this in a custom `UserDetails` object if needed
 //        return oAuth2User;

@@ -18,13 +18,5 @@ public class OAuth2UserInfoFactory {
             default -> throw new OAuth2AuthenticationException(
                     "Sorry! Login with " + registrationId + " is not supported yet.");
         }
-        //if (registrationId.equalsIgnoreCase(AuthProvider.GOOGLE.toString())) {
-        //    return new GoogleOAuth2UserInfo(attributes);
-        //} else if (registrationId.equalsIgnoreCase(AuthProvider.GITHUB.toString())) {
-        //    return new GithubOAuth2UserInfo(attributes);
-        //} else {
-        //    throw new OAuth2AuthenticationException(
-        //            "Sorry! Login with " + registrationId + " is not supported yet.");
-        //}
     }
 }
