@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,6 +50,12 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public int updateRefreshTokenById(UUID id, String refreshToken) {
         return accountRepository.updateRefreshTokenById(id, refreshToken);
+    }
+
+    @Override
+    @Transactional
+    public int updateUpdatedAtById(UUID id, LocalDateTime updatedAt) {
+        return accountRepository.updateUpdatedAtById(id, updatedAt);
     }
 
 }

@@ -6,6 +6,7 @@ import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -160,5 +164,36 @@ class AccountServiceTest {
                 )
                 .orElseThrow();
         assertThat(account.getRefreshToken()).isEqualTo(updatedRefreshToken);
+    }
+
+    @Test
+    @Rollback
+    public void testThatAccountUpdatedAtCanBeUpdated() throws InterruptedException {
+        var user = authService.createUserAndAccount(AuthDto.builder()
+                .email("test@example.com")
+                .name("test")
+                .refreshToken("refreshToken")
+                .accountId("test")
+                .provider(AuthProvider.GOOGLE)
+                .build());
+        var initialUpdatedAt = user.getAccount()
+                .getUpdatedAt();
+
+        TimeUnit.SECONDS.sleep(1);
+        var updatedTime = LocalDateTime.now();
+        accountService.updateUpdatedAtById(
+                user.getAccount()
+                        .getId(), updatedTime
+        );
+        var account = accountRepository.findByUserIdAndProviderId(
+                        user.getUser()
+                                .getId(), AuthProvider.GOOGLE.toString()
+                )
+                .orElseThrow();
+        var accountUpdatedAt = account.getUpdatedAt();
+
+        assertThat(accountUpdatedAt
+        ).isAfter(initialUpdatedAt)
+                .isAfterOrEqualTo(updatedTime);
     }
 }
