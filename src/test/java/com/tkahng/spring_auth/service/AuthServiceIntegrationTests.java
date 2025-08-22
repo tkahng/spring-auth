@@ -1,9 +1,7 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Permission;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.dto.PermissionFilter;
 import com.tkahng.spring_auth.repository.AccountRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.flywaydb.core.Flyway;
@@ -12,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -70,15 +67,9 @@ class AuthServiceIntegrationTests {
         assertThat(user).isNotNull()
                 .matches(user1 -> user.getEmail()
                         .equals("email"));
-        var permission = rbacService.findAllPermissions(
-                        PermissionFilter.builder()
-                                .userId(user.getId())
-                                .build(),
-                        Pageable.unpaged()
-                )
-                .stream()
-                .map(Permission::getName)
-                .toList();
-        assertThat(permission).contains("admin");
+        var permission = rbacService.getPermissionNamesByUserId(user.getId());
+        var role = rbacService.getRoleNamesByUserId(user.getId());
+        assertThat(role).contains("admin");
+        assertThat(permission).contains("admin", "basic", "pro", "advanced");
     }
 }

@@ -4,4 +4,6 @@ import com.tkahng.spring_auth.domain.User;
 
 public interface MailService {
     void sendVerificationMail(User user);
+
+    void sendResetPasswordMail(User user);
 }

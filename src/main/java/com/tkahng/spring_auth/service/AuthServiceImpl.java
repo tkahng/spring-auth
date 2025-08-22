@@ -1,18 +1,15 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.*;
+import com.tkahng.spring_auth.domain.Account;
+import com.tkahng.spring_auth.domain.User;
+import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.*;
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +21,26 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final MailService mailService;
     private final UserService userService;
+
+    private static Account updateAccount(@NotNull AuthDto authDto, Account existingUserAccount) {
+
+        if (authDto.getRefreshToken() != null) {
+            existingUserAccount.setRefreshToken(authDto.getRefreshToken());
+        }
+        if (authDto.getAccessToken() != null) {
+            existingUserAccount.setAccessToken(authDto.getAccessToken());
+        }
+        if (authDto.getExpiresAt() != null) {
+            existingUserAccount.setExpiresAt(authDto.getExpiresAt());
+        }
+        if (authDto.getScope() != null) {
+            existingUserAccount.setScope(authDto.getScope());
+        }
+        if (authDto.getIdToken() != null) {
+            existingUserAccount.setIdToken(authDto.getIdToken());
+        }
+        return existingUserAccount;
+    }
 
     @Override
     public UserAccount findUserAccountByEmailAndProviderId(String email, String providerId) {
@@ -42,7 +59,6 @@ public class AuthServiceImpl implements AuthService {
         userAccount.setAccount(accountDetail);
         return userAccount;
     }
-
 
     @Override
     public Account createAccount(@NotNull AuthDto authDto, User user) {
@@ -65,7 +81,6 @@ public class AuthServiceImpl implements AuthService {
         }
         return accountService.createAccount(account);
     }
-
 
     @Override
     public UserAccount createUserAndAccount(@NotNull AuthDto authDto) {
@@ -98,8 +113,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse generateToken(@NotNull User user) {
-        var roles = getRoleNamesByUserId(user.getId());
-        var permissions = getPermissionNamesByUserId(user.getId());
+        var roles = rbacService.getRoleNamesByUserId(user.getId());
+        var permissions = rbacService.getPermissionNamesByUserId(user.getId());
         var accessToken = jwtService.generateToken(JwtDto.builder()
                 .email(user.getEmail())
                 .userId(user.getId())
@@ -163,15 +178,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse oauth2Login(@NotNull AuthDto authDto) {
+        if (authDto.getProvider() == AuthProvider.CREDENTIALS) {
+            throw new IllegalArgumentException("provider cannot be credentials");
+        }
+
         var existingUserAccount = findUserAccountByEmailAndProviderId(
                 authDto.getEmail(), authDto.getProvider()
                         .toString()
         );
 
-        // check if credentials account already exists
-        // if it does, throw error
+        // check if oauth account already exists
+        // if it does, update account
         if (existingUserAccount.getAccount() != null) {
-            throw new EntityExistsException("user account already exists. please login");
+            var existingAccount = existingUserAccount.getAccount();
+            updateAccount(authDto, existingAccount);
+            var updatedAccount = accountService.createAccount(existingAccount);
+            existingUserAccount.setAccount(updatedAccount);
+            return generateToken(existingUserAccount.getUser());
         }
         UserAccount newUserAccount;
         // if user does not exist, this is a new signup.
@@ -183,22 +206,6 @@ public class AuthServiceImpl implements AuthService {
         }
         // create account
         return generateToken(newUserAccount.getUser());
-    }
-
-    @Override
-    public AuthenticationResponse handleRefreshToken(String refreshToken) {
-        var identifier = tokenService.validateRefreshToken(refreshToken);
-        var user = userService.findUserByEmail(identifier)
-                .orElseThrow(() -> new EntityNotFoundException("user not found"));
-        return generateToken(user);
-    }
-
-    @Override
-    public void handleEmailVerification(String token) {
-        var identifier = tokenService.validateEmailVerificationToken(token);
-        var user = userService.findUserByEmail(identifier)
-                .orElseThrow(() -> new EntityNotFoundException("user not found"));
-        userService.updateUserEmailVerifiedAt(user.getId(), OffsetDateTime.now());
     }
 
     @Override
@@ -217,29 +224,6 @@ public class AuthServiceImpl implements AuthService {
         rbacService.assignRoleToUser(userAccount.getUser(), role);
     }
 
-    @Override
-    public List<String> getRoleNamesByUserId(UUID userId) {
-        return rbacService.findAllRoles(
-                        RoleFilter.builder()
-                                .userId(userId)
-                                .build(), Pageable.unpaged()
-                )
-                .stream()
-                .map(Role::getName)
-                .toList();
-    }
-
-    @Override
-    public List<String> getPermissionNamesByUserId(UUID userId) {
-        return rbacService.findAllPermissions(
-                        PermissionFilter.builder()
-                                .userId(userId)
-                                .build(), Pageable.unpaged()
-                )
-                .stream()
-                .map(Permission::getName)
-                .toList();
-    }
 
     @Override
     public void setPassword(@NotNull User user, @NotNull SetPasswordRequest request) {

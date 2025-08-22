@@ -32,8 +32,10 @@ public class RbacServiceImpl implements RbacService {
     private final UserRoleRepository userRoleRepository;
     private final Map<String, List<String>> rolePermissionMap;
 
-    public RbacServiceImpl(PermissionRepository permissionRepository, RoleRepository roleRepository,
-                           RolePermissionRepository rolePermissionRepository, UserRoleRepository userRoleRepository) {
+    public RbacServiceImpl(
+            PermissionRepository permissionRepository, RoleRepository roleRepository,
+            RolePermissionRepository rolePermissionRepository, UserRoleRepository userRoleRepository
+    ) {
         this.permissionRepository = permissionRepository;
         this.roleRepository = roleRepository;
         this.rolePermissionRepository = rolePermissionRepository;
@@ -69,8 +71,10 @@ public class RbacServiceImpl implements RbacService {
 
     @Override
     public void assignRoleToUser(@NotNull User user, @NotNull Role role) {
-        var existingUserRole = userRoleRepository.findByUserIdAndRoleId(user.getId(),
-                role.getId());
+        var existingUserRole = userRoleRepository.findByUserIdAndRoleId(
+                user.getId(),
+                role.getId()
+        );
         if (existingUserRole.isPresent()) {
             return;
         }
@@ -89,8 +93,10 @@ public class RbacServiceImpl implements RbacService {
 
     @Override
     public void assignPermissionToRole(Role role, Permission permission) {
-        var existingRolePermission = rolePermissionRepository.findByRoleIdAndPermissionId(role.getId(),
-                permission.getId());
+        var existingRolePermission = rolePermissionRepository.findByRoleIdAndPermissionId(
+                role.getId(),
+                permission.getId()
+        );
         if (existingRolePermission.isPresent()) {
             return;
         }
@@ -173,5 +179,29 @@ public class RbacServiceImpl implements RbacService {
                 assignPermissionToRole(role, permission);
             }
         }
+    }
+
+    @Override
+    public List<String> getRoleNamesByUserId(UUID userId) {
+        return findAllRoles(
+                RoleFilter.builder()
+                        .userId(userId)
+                        .build(), Pageable.unpaged()
+        )
+                .stream()
+                .map(Role::getName)
+                .toList();
+    }
+
+    @Override
+    public List<String> getPermissionNamesByUserId(UUID userId) {
+        return findAllPermissions(
+                PermissionFilter.builder()
+                        .userId(userId)
+                        .build(), Pageable.unpaged()
+        )
+                .stream()
+                .map(Permission::getName)
+                .toList();
     }
 }

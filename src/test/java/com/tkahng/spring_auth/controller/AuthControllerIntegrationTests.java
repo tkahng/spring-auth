@@ -8,7 +8,6 @@ import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
 import com.tkahng.spring_auth.service.AuthService;
 import com.tkahng.spring_auth.service.UserService;
-import io.swagger.v3.oas.models.PathItem;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -148,24 +147,18 @@ public class AuthControllerIntegrationTests {
     @Rollback
     public void confirmVerificationPost() throws Exception {
         // 1. Sign up first (or login if user already exists)
-        extracted(PathItem.HttpMethod.POST);
-    }
-
-    @Test
-    @Rollback
-    public void confirmVerificationGet() throws Exception {
-        // 1. Sign up first (or login if user already exists)
-        extracted(PathItem.HttpMethod.GET);
-    }
-
-
-    private void extracted(PathItem.HttpMethod method) throws Exception {
-        mockMvc.perform(post("/api/auth/signup")
+        var result = mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     { "email": "test@example.com", "password": "pass123" }
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        AuthenticationResponse authResponse =
+                objectMapper.readValue(
+                        result.getResponse()
+                                .getContentAsString(), AuthenticationResponse.class
+                );
         var mailContent = mailSenderStub.getEmailsTo("test@example.com")
                 .getFirst();
         assertThat(mailContent).isNotNull();
@@ -173,20 +166,20 @@ public class AuthControllerIntegrationTests {
         assertThat(token).isNotNull()
                 .isNotBlank()
                 .isNotEmpty();
-        switch (method) {
-            case GET -> mockMvc.perform(get("/api/auth/confirm-verification/" + token)
-                            .contentType(MediaType.APPLICATION_JSON)
-                    )
-                    .andExpect(status().isOk());
-            case POST -> mockMvc.perform(post("/api/auth/confirm-verification/" + token)
-                            .contentType(MediaType.APPLICATION_JSON)
-                    )
-                    .andExpect(status().isOk());
-        }
+        mockMvc.perform(
+                        post("/api/auth/confirm-verification/" + token)
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + authResponse.getAccessToken()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk());
         var user = userService.findUserByEmail("test@example.com")
                 .orElseThrow();
         assertThat(user.getEmailVerifiedAt()).isNotNull();
     }
+
 
     @Test
     public void testEmailRegex() throws URISyntaxException {
@@ -212,5 +205,7 @@ public class AuthControllerIntegrationTests {
                 .setEmail("test@example.com")
                 .setProvider(AuthProvider.GOOGLE));
         var authResponse = authService.generateToken(user.getUser());
+        String accessToken = authResponse.getAccessToken();
+
     }
 }

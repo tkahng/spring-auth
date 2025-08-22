@@ -9,6 +9,8 @@ public interface TokenService {
      */
     String generateToken(CreateTokenDto createTokenDto);
 
+    String createToken(String identifier, String type, int ttl);
+
     /**
      * @param token token value
      * @param type  type
@@ -23,4 +25,8 @@ public interface TokenService {
     String generateEmailVerificationToken(String identifier);
 
     String validateEmailVerificationToken(String token);
+
+    String generatePasswordResetToken(String identifier);
+
+    String validatePasswordResetToken(String token);
 }

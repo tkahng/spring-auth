@@ -45,4 +45,8 @@ public interface RbacService {
     void assignPermissionToRole(Role role, Permission permission);
 
     void initRolesAndPermissions();
+    
+    List<String> getRoleNamesByUserId(UUID userId);
+
+    List<String> getPermissionNamesByUserId(UUID userId);
 }
