@@ -41,4 +41,13 @@ public class AuthDto {
     private OffsetDateTime emailVerifiedAt;
 
     private String image;
+
+
+    private String accessToken;
+    private String refreshToken;
+    private Long expiresAt;
+    private String idToken;
+    private String scope;
+    private String sessionState;
+    private String tokenType;
 }

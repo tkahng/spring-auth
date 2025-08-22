@@ -44,14 +44,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Account createAccount(@NotNull AuthDto authDto, User user) {
-        var account = Account.builder()
-                .user(user)
-                .providerId(
+        var account = new Account()
+                .setUser(user)
+                .setIdToken(authDto.getIdToken())
+                .setScope(authDto.getScope())
+                .setSessionState(authDto.getSessionState())
+                .setRefreshToken(authDto.getRefreshToken())
+                .setAccessToken(authDto.getAccessToken())
+                .setExpiresAt(authDto.getExpiresAt())
+                .setProviderId(
                         authDto.getProvider()
                                 .toString()
                 )
-                .accountId(authDto.getAccountId())
-                .build();
+                .setAccountId(authDto.getAccountId());
         if (authDto.getPassword() != null) {
             var hashedPassword = passwordService.encode(authDto.getPassword());
             account.setPasswordHash(hashedPassword);
