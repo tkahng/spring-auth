@@ -96,7 +96,7 @@ class AccountServiceTest {
             Account accountB = accountService.createAccount(Account.builder()
                     .user(user)
                     .accountId("accountId3B")
-                    .providerId("providerId3A")
+                    .providerId("providerId3B")
                     .build());
         } catch (Exception e) {
             assertThat(e.getMessage()).contains("duplicate key value violates unique constraint");

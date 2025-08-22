@@ -7,10 +7,7 @@ import com.tkahng.spring_auth.dto.PermissionFilter;
 import com.tkahng.spring_auth.dto.RoleFilter;
 import com.tkahng.spring_auth.repository.*;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -79,6 +76,7 @@ class RbacServiceTest {
 
     @Test
     @Rollback
+    @DisplayName("Create permission without name")
     void testCreatePermissionNoName() {
         var dto = CreatePermissionDto.builder()
                 .description("test")
@@ -122,6 +120,7 @@ class RbacServiceTest {
 
     @Test
     @Rollback
+    @DisplayName("Create role without name")
     void testCreateRoleNoName() {
         var dto = CreateRoleDto.builder()
                 .description("test")

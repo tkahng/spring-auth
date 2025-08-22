@@ -6,12 +6,11 @@ import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.UserDto;
+import com.tkahng.spring_auth.service.AccountService;
 import com.tkahng.spring_auth.service.AuthService;
 import com.tkahng.spring_auth.service.UserService;
 import org.jetbrains.annotations.Nullable;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -46,6 +45,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerIntegrationTests {
     @Autowired
     private AuthService authService;
+    @Autowired
+    private AccountService accountService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -198,14 +199,34 @@ public class AuthControllerIntegrationTests {
     }
 
     @Test
+    @DisplayName("Set password")
     @Rollback
-    public void testSetPassword() {
+    public void testSetPassword() throws Exception {
         var user = authService.createUserAndAccount(new AuthDto().
                 setAccountId("test@example.com")
                 .setEmail("test@example.com")
                 .setProvider(AuthProvider.GOOGLE));
         var authResponse = authService.generateToken(user.getUser());
         String accessToken = authResponse.getAccessToken();
-
+        mockMvc.perform(
+                        post("/api/auth/set-password")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + authResponse.getAccessToken()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                            { "password": "Password123!", "confirmPassword": "Password123!" }
+                                        """)
+                )
+                .andExpect(status().isOk());
+        var account = accountService.findByUserIdAndProviderId(
+                        user.getUser()
+                                .getId(), AuthProvider.CREDENTIALS.toString()
+                )
+                .orElse(null);
+        Assertions.assertNotNull(account);
+        assertThat(account.getProviderId()).isEqualTo(AuthProvider.CREDENTIALS.toString());
     }
+
 }
