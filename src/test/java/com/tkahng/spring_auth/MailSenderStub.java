@@ -3,6 +3,7 @@ package com.tkahng.spring_auth;
 import com.tkahng.spring_auth.dto.EmailDto;
 import com.tkahng.spring_auth.service.MailSender;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,8 +22,11 @@ import java.util.stream.Collectors;
 @Primary
 public class MailSenderStub implements MailSender {
 
+
     @Getter
     private final List<EmailDto> sentEmails = new ArrayList<>();
+    @Setter
+    private volatile CountDownLatch latch;
 
     @Override
     public void sendMail(EmailDto notificationEmail) {
@@ -40,6 +45,9 @@ public class MailSenderStub implements MailSender {
                 notificationEmail.getBody()
         );
         log.info(logMessage);
+        if (latch != null) {
+            latch.countDown();
+        }
     }
 
     /**
