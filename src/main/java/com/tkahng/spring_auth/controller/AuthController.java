@@ -89,6 +89,12 @@ public class AuthController {
         authService.setPassword(user, request);
     }
 
+    @Authenticated
+    @PostMapping("/update-password")
+    public void updatePassword(@CurrentUser User user, @RequestBody @NotNull UpdatePasswordRequest request) {
+        authService.validateAndUpdatePassword(user, request);
+    }
+
     @PostMapping("/request-password-reset")
     public void requestPasswordReset(@RequestBody @NotNull RequestPasswordResetRequest request) {
         var userAccount = authService.findUserAccountByEmailAndProviderId(

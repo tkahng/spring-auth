@@ -5,9 +5,11 @@ import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.*;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -247,5 +249,17 @@ public class AuthServiceImpl implements AuthService {
         if (rowsUpdated == 0) {
             throw new IllegalStateException("no accounts were updated");
         }
+    }
+
+    @Override
+    @Transactional
+    public void validateAndUpdatePassword(User user, UpdatePasswordRequest request) {
+        var account = accountService.findByUserIdAndProviderId(user.getId(), AuthProvider.CREDENTIALS.toString())
+                .orElseThrow(() -> new EntityNotFoundException("user account not found"));
+        if (!passwordService.matches(request.getOldPassword(), account.getPasswordHash())) {
+            throw new IllegalArgumentException("invalid password");
+        }
+
+        updateAccountPassword(account.getId(), request.getNewPassword());
     }
 }

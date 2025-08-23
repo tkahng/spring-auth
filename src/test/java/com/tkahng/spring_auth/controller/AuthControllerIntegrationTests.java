@@ -261,6 +261,46 @@ public class AuthControllerIntegrationTests {
     }
 
     @Test
+    @DisplayName("Update password")
+    @Rollback
+    public void testUpdatePassword() throws Exception {
+        var oldPassword = "Password123!";
+        var newPassword = "NewPassword123!";
+        var user = authService.createUserAndAccount(new AuthDto()
+                .setEmailVerifiedAt(OffsetDateTime.now())
+                .setAccountId("test@example.com")
+                .setPassword(oldPassword)
+                .setEmail("test@example.com")
+                .setProvider(AuthProvider.CREDENTIALS));
+        var authResponse = authService.generateToken(user.getUser());
+        String accessToken = authResponse.getAccessToken();
+        mockMvc.perform(
+                        post("/api/auth/update-password")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + authResponse.getAccessToken()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                            { "oldPassword": "%s", "newPassword": "%s" }
+                                        """.formatted(oldPassword, newPassword))
+                )
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                            { "password": "%s", "email": "%s" }
+                                        """.formatted(
+                                        newPassword, user.getUser()
+                                                .getEmail()
+                                ))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("Reset password")
     @Rollback
     public void testResetPassword() throws Exception {

@@ -6,6 +6,7 @@ import com.tkahng.spring_auth.domain.UserAccount;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.SetPasswordRequest;
+import com.tkahng.spring_auth.dto.UpdatePasswordRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -95,4 +96,8 @@ public interface AuthService {
     void setPassword(@NotNull User user, @NotNull SetPasswordRequest request);
 
     void updateAccountPassword(UUID accountId, String password);
+
+    void validateAndUpdatePassword(User user, UpdatePasswordRequest request);
+    
+
 }
