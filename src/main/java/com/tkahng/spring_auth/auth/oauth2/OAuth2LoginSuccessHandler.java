@@ -3,11 +3,11 @@ package com.tkahng.spring_auth.auth.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tkahng.spring_auth.auth.AuthService;
-import com.tkahng.spring_auth.auth.oauth2.user.OAuth2UserInfoFactory;
 import com.tkahng.spring_auth.auth.dto.AuthDto;
 import com.tkahng.spring_auth.auth.dto.AuthProvider;
 import com.tkahng.spring_auth.auth.dto.AuthenticationResponse;
-import com.tkahng.spring_auth.util.CookieUtils;
+import com.tkahng.spring_auth.auth.oauth2.user.OAuth2UserInfoFactory;
+import com.tkahng.spring_auth.common.util.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,11 +1,7 @@
 package com.tkahng.spring_auth.rbac;
 
-import com.tkahng.spring_auth.dto.CreatePermissionDto;
-import com.tkahng.spring_auth.dto.CreateRoleDto;
-import com.tkahng.spring_auth.dto.PermissionFilter;
-import com.tkahng.spring_auth.dto.RoleFilter;
-import com.tkahng.spring_auth.spec.PermissionSpecifications;
-import com.tkahng.spring_auth.spec.RoleSpecifications;
+import com.tkahng.spring_auth.rbac.spec.PermissionSpecifications;
+import com.tkahng.spring_auth.rbac.spec.RoleSpecifications;
 import com.tkahng.spring_auth.users.User;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

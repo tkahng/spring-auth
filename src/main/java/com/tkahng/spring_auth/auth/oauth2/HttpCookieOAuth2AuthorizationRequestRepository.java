@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.auth.oauth2;
 
-import com.tkahng.spring_auth.util.CookieUtils;
+import com.tkahng.spring_auth.common.util.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;

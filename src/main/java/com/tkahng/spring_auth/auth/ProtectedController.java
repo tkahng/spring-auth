@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.auth;
 
-import com.tkahng.spring_auth.annotation.HasPermission;
+import com.tkahng.spring_auth.auth.annotation.HasPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

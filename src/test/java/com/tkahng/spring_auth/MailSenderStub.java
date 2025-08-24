@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth;
 
 import com.tkahng.spring_auth.dto.EmailDto;
-import com.tkahng.spring_auth.service.MailSender;
+import com.tkahng.spring_auth.mail.MailSender;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

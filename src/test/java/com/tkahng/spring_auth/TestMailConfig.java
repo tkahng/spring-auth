@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth;
 
-import com.tkahng.spring_auth.service.MailSender;
+import com.tkahng.spring_auth.mail.MailSender;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 

@@ -2,8 +2,8 @@ package com.tkahng.spring_auth.auth;
 
 import com.tkahng.spring_auth.auth.dto.AuthDto;
 import com.tkahng.spring_auth.auth.dto.AuthenticationResponse;
-import com.tkahng.spring_auth.dto.SetPasswordRequest;
-import com.tkahng.spring_auth.dto.UpdatePasswordRequest;
+import com.tkahng.spring_auth.auth.dto.SetPasswordRequest;
+import com.tkahng.spring_auth.auth.dto.UpdatePasswordRequest;
 import com.tkahng.spring_auth.identities.Identity;
 import com.tkahng.spring_auth.users.User;
 import org.jetbrains.annotations.NotNull;
