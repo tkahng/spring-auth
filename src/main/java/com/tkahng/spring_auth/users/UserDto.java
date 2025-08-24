@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.dto;
+package com.tkahng.spring_auth.users;
 
 import lombok.Builder;
 import lombok.Data;

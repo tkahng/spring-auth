@@ -1,6 +1,5 @@
-package com.tkahng.spring_auth.service;
+package com.tkahng.spring_auth.users;
 
-import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
 import org.jetbrains.annotations.NotNull;
 

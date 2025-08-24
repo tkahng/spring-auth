@@ -1,8 +1,9 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.User;
+import com.tkahng.spring_auth.users.User;
 import com.tkahng.spring_auth.dto.AuthDto;
-import com.tkahng.spring_auth.repository.UserRepository;
+import com.tkahng.spring_auth.users.UserRepository;
+import com.tkahng.spring_auth.users.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,5 +73,5 @@ class UserServiceTest {
         assertThat(userA2.getEmailVerifiedAt()).isNotNull();
         assertThat(userB2.getEmailVerifiedAt()).isNull();
     }
-    
+
 }

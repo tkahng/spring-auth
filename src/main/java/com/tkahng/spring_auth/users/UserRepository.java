@@ -1,6 +1,5 @@
-package com.tkahng.spring_auth.repository;
+package com.tkahng.spring_auth.users;
 
-import com.tkahng.spring_auth.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

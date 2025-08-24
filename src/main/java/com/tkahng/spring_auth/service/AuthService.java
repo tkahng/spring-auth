@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.Identity;
-import com.tkahng.spring_auth.domain.User;
+import com.tkahng.spring_auth.users.User;
 import com.tkahng.spring_auth.domain.UserIdentity;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;

@@ -1,9 +1,10 @@
 package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.domain.Identity;
-import com.tkahng.spring_auth.domain.User;
+import com.tkahng.spring_auth.users.User;
 import com.tkahng.spring_auth.domain.UserIdentity;
 import com.tkahng.spring_auth.dto.*;
+import com.tkahng.spring_auth.users.UserService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

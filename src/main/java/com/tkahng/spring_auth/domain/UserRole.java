@@ -1,5 +1,6 @@
 package com.tkahng.spring_auth.domain;
 
+import com.tkahng.spring_auth.users.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

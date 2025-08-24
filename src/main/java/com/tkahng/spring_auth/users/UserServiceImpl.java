@@ -1,8 +1,6 @@
-package com.tkahng.spring_auth.service;
+package com.tkahng.spring_auth.users;
 
-import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
-import com.tkahng.spring_auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;

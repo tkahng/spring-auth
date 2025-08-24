@@ -1,11 +1,12 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.User;
+import com.tkahng.spring_auth.users.User;
 import com.tkahng.spring_auth.dto.CreatePermissionDto;
 import com.tkahng.spring_auth.dto.CreateRoleDto;
 import com.tkahng.spring_auth.dto.PermissionFilter;
 import com.tkahng.spring_auth.dto.RoleFilter;
 import com.tkahng.spring_auth.repository.*;
+import com.tkahng.spring_auth.users.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;

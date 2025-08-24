@@ -11,6 +11,7 @@ import com.tkahng.spring_auth.repository.RoleRepository;
 import com.tkahng.spring_auth.repository.UserRoleRepository;
 import com.tkahng.spring_auth.spec.PermissionSpecifications;
 import com.tkahng.spring_auth.spec.RoleSpecifications;
+import com.tkahng.spring_auth.users.User;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
