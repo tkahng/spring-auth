@@ -1,6 +1,5 @@
 package com.tkahng.spring_auth.token;
 
-import com.tkahng.spring_auth.dto.CreateTokenDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

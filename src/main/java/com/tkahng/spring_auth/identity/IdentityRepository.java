@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.identities;
+package com.tkahng.spring_auth.identity;
 
 
 import jakarta.transaction.Transactional;

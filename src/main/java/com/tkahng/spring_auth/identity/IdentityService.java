@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.identities;
+package com.tkahng.spring_auth.identity;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.query.Param;

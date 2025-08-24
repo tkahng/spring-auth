@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.identities;
+package com.tkahng.spring_auth.identity;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.mail.email;
 
-import com.tkahng.spring_auth.dto.EmailDto;
+import com.tkahng.spring_auth.mail.EmailDto;
 import com.tkahng.spring_auth.mail.MailSender;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;

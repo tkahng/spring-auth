@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth.auth;
 
-import com.tkahng.spring_auth.identities.Identity;
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.identity.Identity;
+import com.tkahng.spring_auth.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

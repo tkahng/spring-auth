@@ -1,15 +1,15 @@
 package com.tkahng.spring_auth.auth;
 
 import com.tkahng.spring_auth.auth.dto.*;
-import com.tkahng.spring_auth.dto.JwtDto;
-import com.tkahng.spring_auth.identities.Identity;
-import com.tkahng.spring_auth.identities.IdentityService;
+import com.tkahng.spring_auth.identity.Identity;
+import com.tkahng.spring_auth.identity.IdentityService;
+import com.tkahng.spring_auth.jwt.JwtDto;
 import com.tkahng.spring_auth.jwt.JwtService;
 import com.tkahng.spring_auth.mail.MailService;
 import com.tkahng.spring_auth.rbac.RbacService;
 import com.tkahng.spring_auth.token.TokenService;
-import com.tkahng.spring_auth.users.User;
-import com.tkahng.spring_auth.users.UserService;
+import com.tkahng.spring_auth.user.User;
+import com.tkahng.spring_auth.user.UserService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.mail.email;
 
-import com.tkahng.spring_auth.dto.EmailDto;
+import com.tkahng.spring_auth.mail.EmailDto;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.springframework.stereotype.Service;

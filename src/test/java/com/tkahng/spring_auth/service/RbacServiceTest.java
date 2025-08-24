@@ -1,8 +1,8 @@
 package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.rbac.*;
-import com.tkahng.spring_auth.users.User;
-import com.tkahng.spring_auth.users.UserRepository;
+import com.tkahng.spring_auth.user.User;
+import com.tkahng.spring_auth.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;

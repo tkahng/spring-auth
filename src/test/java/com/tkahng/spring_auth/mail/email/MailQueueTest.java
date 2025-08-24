@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth.mail.email;
 
 import com.tkahng.spring_auth.MailSenderStub;
-import com.tkahng.spring_auth.dto.EmailDto;
+import com.tkahng.spring_auth.mail.EmailDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

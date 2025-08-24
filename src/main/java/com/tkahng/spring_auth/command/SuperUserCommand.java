@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth.command;
 
 import com.tkahng.spring_auth.auth.AuthService;
-import com.tkahng.spring_auth.users.UserService;
+import com.tkahng.spring_auth.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;

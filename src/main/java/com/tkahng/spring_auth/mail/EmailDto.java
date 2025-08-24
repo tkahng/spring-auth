@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.dto;
+package com.tkahng.spring_auth.mail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,12 +8,11 @@ import lombok.experimental.Accessors;
 
 @Accessors(chain = true)
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CreateTokenDto {
-    private String identifier;
-    private String type;
-    private String value;
-    private int ttl;
+public class EmailDto {
+    private String subject;
+    private String recipient;
+    private String body;
 }

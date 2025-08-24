@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.dto;
+package com.tkahng.spring_auth.jwt;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;

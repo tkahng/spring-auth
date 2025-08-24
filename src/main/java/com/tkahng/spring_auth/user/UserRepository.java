@@ -1,4 +1,4 @@
-package com.tkahng.spring_auth.users;
+package com.tkahng.spring_auth.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.rbac;
 
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.user.User;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;

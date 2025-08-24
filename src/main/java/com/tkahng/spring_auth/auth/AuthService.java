@@ -4,8 +4,8 @@ import com.tkahng.spring_auth.auth.dto.AuthDto;
 import com.tkahng.spring_auth.auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.auth.dto.SetPasswordRequest;
 import com.tkahng.spring_auth.auth.dto.UpdatePasswordRequest;
-import com.tkahng.spring_auth.identities.Identity;
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.identity.Identity;
+import com.tkahng.spring_auth.user.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;

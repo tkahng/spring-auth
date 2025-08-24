@@ -1,6 +1,5 @@
 package com.tkahng.spring_auth.jwt;
 
-import com.tkahng.spring_auth.dto.JwtDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;

@@ -1,8 +1,7 @@
 package com.tkahng.spring_auth.mail;
 
-import com.tkahng.spring_auth.dto.EmailDto;
 import com.tkahng.spring_auth.token.TokenService;
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package com.tkahng.spring_auth.rbac;
 
 import com.tkahng.spring_auth.rbac.spec.PermissionSpecifications;
 import com.tkahng.spring_auth.rbac.spec.RoleSpecifications;
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.user.User;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;

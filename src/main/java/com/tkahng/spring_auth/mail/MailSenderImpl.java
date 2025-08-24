@@ -1,6 +1,5 @@
 package com.tkahng.spring_auth.mail;
 
-import com.tkahng.spring_auth.dto.EmailDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;

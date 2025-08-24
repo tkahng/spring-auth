@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.mail;
 
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.user.User;
 
 public interface MailService {
     void sendVerificationMail(User user);
