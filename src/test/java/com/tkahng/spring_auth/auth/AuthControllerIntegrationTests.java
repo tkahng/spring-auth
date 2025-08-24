@@ -1,9 +1,7 @@
-package com.tkahng.spring_auth.controller;
+package com.tkahng.spring_auth.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tkahng.spring_auth.MailSenderStub;
-import com.tkahng.spring_auth.auth.AuthService;
-import com.tkahng.spring_auth.auth.PasswordService;
 import com.tkahng.spring_auth.auth.dto.AuthDto;
 import com.tkahng.spring_auth.auth.dto.AuthProvider;
 import com.tkahng.spring_auth.auth.dto.AuthenticationResponse;

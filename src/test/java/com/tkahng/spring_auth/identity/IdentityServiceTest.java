@@ -1,12 +1,9 @@
-package com.tkahng.spring_auth.service;
+package com.tkahng.spring_auth.identity;
 
 import com.tkahng.spring_auth.auth.AuthService;
 import com.tkahng.spring_auth.auth.PasswordService;
 import com.tkahng.spring_auth.auth.dto.AuthDto;
 import com.tkahng.spring_auth.auth.dto.AuthProvider;
-import com.tkahng.spring_auth.identity.Identity;
-import com.tkahng.spring_auth.identity.IdentityRepository;
-import com.tkahng.spring_auth.identity.IdentityService;
 import com.tkahng.spring_auth.user.User;
 import com.tkahng.spring_auth.user.UserRepository;
 import com.tkahng.spring_auth.user.UserService;

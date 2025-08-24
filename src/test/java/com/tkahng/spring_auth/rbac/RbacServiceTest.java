@@ -1,6 +1,5 @@
-package com.tkahng.spring_auth.service;
+package com.tkahng.spring_auth.rbac;
 
-import com.tkahng.spring_auth.rbac.*;
 import com.tkahng.spring_auth.user.User;
 import com.tkahng.spring_auth.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,5 @@
-package com.tkahng.spring_auth.service;
+package com.tkahng.spring_auth.token;
 
-import com.tkahng.spring_auth.token.TokenRepository;
-import com.tkahng.spring_auth.token.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

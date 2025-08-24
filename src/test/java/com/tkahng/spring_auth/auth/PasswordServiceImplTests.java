@@ -1,6 +1,5 @@
-package com.tkahng.spring_auth.service;
+package com.tkahng.spring_auth.auth;
 
-import com.tkahng.spring_auth.auth.PasswordService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,5 @@
-package com.tkahng.spring_auth.repository;
+package com.tkahng.spring_auth.user;
 
-import com.tkahng.spring_auth.user.User;
-import com.tkahng.spring_auth.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

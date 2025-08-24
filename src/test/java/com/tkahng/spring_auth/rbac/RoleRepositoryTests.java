@@ -1,7 +1,5 @@
-package com.tkahng.spring_auth.repository;
+package com.tkahng.spring_auth.rbac;
 
-import com.tkahng.spring_auth.rbac.Role;
-import com.tkahng.spring_auth.rbac.RoleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
