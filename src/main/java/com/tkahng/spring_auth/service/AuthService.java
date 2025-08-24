@@ -1,8 +1,8 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Account;
+import com.tkahng.spring_auth.domain.Identity;
 import com.tkahng.spring_auth.domain.User;
-import com.tkahng.spring_auth.domain.UserAccount;
+import com.tkahng.spring_auth.domain.UserIdentity;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.SetPasswordRequest;
@@ -15,11 +15,11 @@ public interface AuthService {
     // CRUD Methods -------------------------------------------------------------
     //Optional<User> findUserByEmail(String email);
 
-    UserAccount findUserAccountByEmailAndProviderId(String email, String providerId);
+    UserIdentity findUserAccountByEmailAndProviderId(String email, String providerId);
 
     //User createUser(@NotNull AuthDto authDto);
 
-    Account createAccount(@NotNull AuthDto authDto, User user);
+    Identity createAccount(@NotNull AuthDto authDto, User user);
 
     /**
      * creates a new user and new account.
@@ -27,7 +27,7 @@ public interface AuthService {
      * @param authDto authDto
      * @return UserAccount
      */
-    UserAccount createUserAndAccount(@NotNull AuthDto authDto);
+    UserIdentity createUserAndAccount(@NotNull AuthDto authDto);
 
     /**
      * creates a new account for an existing user.
@@ -37,7 +37,7 @@ public interface AuthService {
      * @param user    existing user
      * @return UserAccount
      */
-    UserAccount createAccountFromUser(@NotNull AuthDto authDto, User user);
+    UserIdentity createAccountFromUser(@NotNull AuthDto authDto, User user);
 
     /**
      * this method is called when a new user signs up, creating a new user and a new account.
@@ -47,7 +47,7 @@ public interface AuthService {
      * @param authDto authDto
      * @return UserAccount
      */
-    UserAccount signupNewUser(@NotNull AuthDto authDto);
+    UserIdentity signupNewUser(@NotNull AuthDto authDto);
 
 
     /**
@@ -75,7 +75,7 @@ public interface AuthService {
      * @param user    existing user
      * @return UserAccount
      */
-    UserAccount linkAccount(@NotNull AuthDto authDto, @NotNull User user);
+    UserIdentity linkAccount(@NotNull AuthDto authDto, @NotNull User user);
 
     /**
      * generates a new token for the user.
@@ -98,6 +98,6 @@ public interface AuthService {
     void updateAccountPassword(UUID accountId, String password);
 
     void validateAndUpdatePassword(User user, UpdatePasswordRequest request);
-    
+
 
 }

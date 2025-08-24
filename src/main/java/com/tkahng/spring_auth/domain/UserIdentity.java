@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserAccount {
+public class UserIdentity {
     private User user;
-    private Account account;
-    private List<Account> accounts = new ArrayList<>();
+    private Identity identity;
+    private List<Identity> identities = new ArrayList<>();
 }

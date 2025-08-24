@@ -1,8 +1,8 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Account;
+import com.tkahng.spring_auth.domain.Identity;
 import com.tkahng.spring_auth.domain.User;
-import com.tkahng.spring_auth.domain.UserAccount;
+import com.tkahng.spring_auth.domain.UserIdentity;
 import com.tkahng.spring_auth.dto.*;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,52 +19,52 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final PasswordService passwordService;
-    private final AccountService accountService;
+    private final IdentityService identityService;
     private final RbacService rbacService;
     private final TokenService tokenService;
     private final MailService mailService;
     private final UserService userService;
 
-    private static void updateAccount(@NotNull AuthDto authDto, Account existingUserAccount) {
+    private static void updateAccount(@NotNull AuthDto authDto, Identity existingUserIdentity) {
 
         if (authDto.getRefreshToken() != null) {
-            existingUserAccount.setRefreshToken(authDto.getRefreshToken());
+            existingUserIdentity.setRefreshToken(authDto.getRefreshToken());
         }
         if (authDto.getAccessToken() != null) {
-            existingUserAccount.setAccessToken(authDto.getAccessToken());
+            existingUserIdentity.setAccessToken(authDto.getAccessToken());
         }
         if (authDto.getExpiresAt() != null) {
-            existingUserAccount.setExpiresAt(authDto.getExpiresAt());
+            existingUserIdentity.setExpiresAt(authDto.getExpiresAt());
         }
         if (authDto.getScope() != null) {
-            existingUserAccount.setScope(authDto.getScope());
+            existingUserIdentity.setScope(authDto.getScope());
         }
         if (authDto.getIdToken() != null) {
-            existingUserAccount.setIdToken(authDto.getIdToken());
+            existingUserIdentity.setIdToken(authDto.getIdToken());
         }
     }
 
     @Override
-    public UserAccount findUserAccountByEmailAndProviderId(String email, String providerId) {
-        var userAccount = new UserAccount();
+    public UserIdentity findUserAccountByEmailAndProviderId(String email, String providerId) {
+        var userAccount = new UserIdentity();
         Optional<User> user = userService.findUserByEmail(email);
         if (user.isEmpty()) {
             return userAccount;
         }
         var userDetail = user.get();
         userAccount.setUser(userDetail);
-        Optional<Account> account = accountService.findByUserIdAndProviderId(userDetail.getId(), providerId);
+        Optional<Identity> account = identityService.findByUserIdAndProviderId(userDetail.getId(), providerId);
         if (account.isEmpty()) {
             return userAccount;
         }
         var accountDetail = account.get();
-        userAccount.setAccount(accountDetail);
+        userAccount.setIdentity(accountDetail);
         return userAccount;
     }
 
     @Override
-    public Account createAccount(@NotNull AuthDto authDto, User user) {
-        var account = new Account()
+    public Identity createAccount(@NotNull AuthDto authDto, User user) {
+        var account = new Identity()
                 .setUser(user)
                 .setIdToken(authDto.getIdToken())
                 .setScope(authDto.getScope())
@@ -81,27 +81,27 @@ public class AuthServiceImpl implements AuthService {
             var hashedPassword = passwordService.encode(authDto.getPassword());
             account.setPasswordHash(hashedPassword);
         }
-        return accountService.createAccount(account);
+        return identityService.createAccount(account);
     }
 
     @Override
-    public UserAccount createUserAndAccount(@NotNull AuthDto authDto) {
+    public UserIdentity createUserAndAccount(@NotNull AuthDto authDto) {
         var user = userService.createUser(authDto);
         return createAccountFromUser(authDto, user);
     }
 
     @Override
-    public UserAccount createAccountFromUser(@NotNull AuthDto authDto, User user) {
+    public UserIdentity createAccountFromUser(@NotNull AuthDto authDto, User user) {
         var account = createAccount(authDto, user);
-        var userAccount = new UserAccount();
+        var userAccount = new UserIdentity();
         userAccount.setUser(user);
-        userAccount.setAccount(account);
+        userAccount.setIdentity(account);
         return userAccount;
     }
 
     @Override
-    public UserAccount signupNewUser(@NotNull AuthDto authDto) {
-        UserAccount userAndAccount = createUserAndAccount(authDto);
+    public UserIdentity signupNewUser(@NotNull AuthDto authDto) {
+        UserIdentity userAndAccount = createUserAndAccount(authDto);
         if (authDto.getEmailVerifiedAt() == null) {
             mailService.sendVerificationMail(userAndAccount.getUser());
         }
@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserAccount linkAccount(@NotNull AuthDto authDto, @NotNull User user) {
+    public UserIdentity linkAccount(@NotNull AuthDto authDto, @NotNull User user) {
         return createAccountFromUser(authDto, user);
     }
 
@@ -137,15 +137,15 @@ public class AuthServiceImpl implements AuthService {
         if (userAccount.getUser() == null) {
             throw new IllegalStateException("user not found");
         }
-        if (userAccount.getAccount() == null) {
+        if (userAccount.getIdentity() == null) {
             throw new IllegalStateException("user account not found");
         }
-        if (userAccount.getAccount()
+        if (userAccount.getIdentity()
                 .getPasswordHash() == null) {
             throw new IllegalStateException("password not found");
         }
         if (!passwordService.matches(
-                authDto.getPassword(), userAccount.getAccount()
+                authDto.getPassword(), userAccount.getIdentity()
                         .getPasswordHash()
         )) {
             throw new IllegalArgumentException("invalid password");
@@ -162,19 +162,19 @@ public class AuthServiceImpl implements AuthService {
 
         // check if credentials account already exists
         // if it does, throw error
-        if (existingUserAccount.getAccount() != null) {
+        if (existingUserAccount.getIdentity() != null) {
             throw new EntityExistsException("user account already exists. please login");
         }
-        UserAccount newUserAccount;
+        UserIdentity newUserIdentity;
         // if user does not exist, this is a new signup.
         if (existingUserAccount.getUser() == null) {
-            newUserAccount = signupNewUser(authDto);
+            newUserIdentity = signupNewUser(authDto);
         } else {
             // if user exists, link account
-            newUserAccount = linkAccount(authDto, existingUserAccount.getUser());
+            newUserIdentity = linkAccount(authDto, existingUserAccount.getUser());
         }
         // create account
-        return generateToken(newUserAccount.getUser());
+        return generateToken(newUserIdentity.getUser());
 
     }
 
@@ -191,23 +191,23 @@ public class AuthServiceImpl implements AuthService {
 
         // check if oauth account already exists
         // if it does, update account
-        if (existingUserAccount.getAccount() != null) {
-            var existingAccount = existingUserAccount.getAccount();
+        if (existingUserAccount.getIdentity() != null) {
+            var existingAccount = existingUserAccount.getIdentity();
             updateAccount(authDto, existingAccount);
-            var updatedAccount = accountService.createAccount(existingAccount);
-            existingUserAccount.setAccount(updatedAccount);
+            var updatedAccount = identityService.createAccount(existingAccount);
+            existingUserAccount.setIdentity(updatedAccount);
             return generateToken(existingUserAccount.getUser());
         }
-        UserAccount newUserAccount;
+        UserIdentity newUserIdentity;
         // if user does not exist, this is a new signup.
         if (existingUserAccount.getUser() == null) {
-            newUserAccount = signupNewUser(authDto);
+            newUserIdentity = signupNewUser(authDto);
         } else {
             // if user exists, link account
-            newUserAccount = linkAccount(authDto, existingUserAccount.getUser());
+            newUserIdentity = linkAccount(authDto, existingUserAccount.getUser());
         }
         // create account
-        return generateToken(newUserAccount.getUser());
+        return generateToken(newUserIdentity.getUser());
     }
 
     @Override
@@ -229,7 +229,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void setPassword(@NotNull User user, @NotNull SetPasswordRequest request) {
-        var userAccount = accountService.findByUserIdAndProviderId(user.getId(), AuthProvider.CREDENTIALS.toString())
+        var userAccount = identityService.findByUserIdAndProviderId(user.getId(), AuthProvider.CREDENTIALS.toString())
                 .orElse(null);
         if (userAccount != null) {
             throw new IllegalStateException("cannot set password on existing credentials account");
@@ -245,7 +245,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void updateAccountPassword(UUID accountId, String password) {
         var hashedPassword = passwordService.encode(password);
-        var rowsUpdated = accountService.updatePasswordById(accountId, hashedPassword);
+        var rowsUpdated = identityService.updatePasswordById(accountId, hashedPassword);
         if (rowsUpdated == 0) {
             throw new IllegalStateException("no accounts were updated");
         }
@@ -254,7 +254,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void validateAndUpdatePassword(User user, UpdatePasswordRequest request) {
-        var account = accountService.findByUserIdAndProviderId(user.getId(), AuthProvider.CREDENTIALS.toString())
+        var account = identityService.findByUserIdAndProviderId(user.getId(), AuthProvider.CREDENTIALS.toString())
                 .orElseThrow(() -> new EntityNotFoundException("user account not found"));
         if (!passwordService.matches(request.getOldPassword(), account.getPasswordHash())) {
             throw new IllegalArgumentException("invalid password");

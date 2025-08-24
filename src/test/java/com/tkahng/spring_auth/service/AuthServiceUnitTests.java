@@ -1,9 +1,9 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Account;
+import com.tkahng.spring_auth.domain.Identity;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.*;
-import com.tkahng.spring_auth.repository.AccountRepository;
+import com.tkahng.spring_auth.repository.IdentityRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ public class AuthServiceUnitTests {
     @Autowired
     private PasswordService passwordService;
     @MockitoBean
-    private AccountRepository accountRepository;
+    private IdentityRepository identityRepository;
     @MockitoBean
     private UserRepository userRepository;
     @MockitoBean
@@ -53,14 +53,14 @@ public class AuthServiceUnitTests {
                 .build();
         var password = "Password123!";
         var hashedPassword = passwordService.encode(password);
-        var account = Account.builder()
+        var account = Identity.builder()
                 .user(user)
                 .providerId(AuthProvider.CREDENTIALS.toString())
                 .accountId("test@example.com")
                 .passwordHash(hashedPassword)
                 .build();
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(accountRepository.findByUserIdAndProviderId(
+        when(identityRepository.findByUserIdAndProviderId(
                 user.getId(),
                 AuthProvider.CREDENTIALS.toString()
         )).thenReturn(Optional.of(account));
@@ -117,7 +117,7 @@ public class AuthServiceUnitTests {
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(User.builder()
                 .email("email")
                 .build()));
-        when(accountRepository.findByUserIdAndProviderId(
+        when(identityRepository.findByUserIdAndProviderId(
                 user.getId(),
                 AuthProvider.CREDENTIALS.toString()
         )).thenReturn(Optional.empty());
@@ -141,13 +141,13 @@ public class AuthServiceUnitTests {
         var user = User.builder()
                 .email("email")
                 .build();
-        var account = Account.builder()
+        var account = Identity.builder()
                 .user(user)
                 .providerId(AuthProvider.CREDENTIALS.toString())
                 .accountId("email")
                 .build();
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));
-        when(accountRepository.findByUserIdAndProviderId(
+        when(identityRepository.findByUserIdAndProviderId(
                 user.getId(),
                 AuthProvider.CREDENTIALS.toString()
         )).thenReturn(Optional.of(account));
@@ -173,14 +173,14 @@ public class AuthServiceUnitTests {
                 .build();
         var wrongPassword = "wrongPassword";
         var wrongHashedPassword = passwordService.encode(wrongPassword);
-        var account = Account.builder()
+        var account = Identity.builder()
                 .user(user)
                 .providerId(AuthProvider.CREDENTIALS.toString())
                 .passwordHash(wrongHashedPassword)
                 .accountId("email")
                 .build();
         when(userRepository.findByEmail("email")).thenReturn(Optional.of(user));
-        when(accountRepository.findByUserIdAndProviderId(
+        when(identityRepository.findByUserIdAndProviderId(
                 user.getId(),
                 AuthProvider.CREDENTIALS.toString()
         )).thenReturn(Optional.of(account));

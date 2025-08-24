@@ -46,7 +46,7 @@ public class AuthControllerIntegrationTests {
     @Autowired
     private AuthService authService;
     @Autowired
-    private AccountService accountService;
+    private IdentityService identityService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -251,7 +251,7 @@ public class AuthControllerIntegrationTests {
                                         """)
                 )
                 .andExpect(status().isOk());
-        var account = accountService.findByUserIdAndProviderId(
+        var account = identityService.findByUserIdAndProviderId(
                         user.getUser()
                                 .getId(), AuthProvider.CREDENTIALS.toString()
                 )
@@ -342,7 +342,7 @@ public class AuthControllerIntegrationTests {
                                         """.formatted(newPassword, newPassword))
                 )
                 .andExpect(status().isOk());
-        var account = accountService.findByUserIdAndProviderId(
+        var account = identityService.findByUserIdAndProviderId(
                         user.getUser()
                                 .getId(), AuthProvider.CREDENTIALS.toString()
                 )

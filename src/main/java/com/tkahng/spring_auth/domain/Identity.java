@@ -21,15 +21,8 @@ import java.util.UUID;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "accounts",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "user_id_provider_id_unique",
-                        columnNames = {"user_id", "provider_id"}
-                )
-        }
-)
-public class Account {
+@Table(name = "identities")
+public class Identity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

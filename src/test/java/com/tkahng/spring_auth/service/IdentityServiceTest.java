@@ -1,10 +1,10 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Account;
+import com.tkahng.spring_auth.domain.Identity;
 import com.tkahng.spring_auth.domain.User;
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.repository.AccountRepository;
+import com.tkahng.spring_auth.repository.IdentityRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -30,15 +30,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class AccountServiceTest {
+class IdentityServiceTest {
     @Autowired
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private AccountService accountService;
+    private IdentityService identityService;
     @Autowired
-    private AccountRepository accountRepository;
+    private IdentityRepository identityRepository;
     @Autowired
     private AuthService authService;
     @Autowired
@@ -48,44 +48,44 @@ class AccountServiceTest {
     @Rollback
     public void testThatAccountCanBeCreatedAndRecalled() {
         User user = userService.createUser(new AuthDto().setEmail("email1@email.com"));
-        Account account = accountService.createAccount(Account.builder()
+        Identity identity = identityService.createAccount(Identity.builder()
                 .user(user)
                 .accountId("accountId1")
                 .providerId("providerId1")
                 .build());
 
-        Optional<Account> result = accountService.findById(account.getId());
+        Optional<Identity> result = identityService.findById(identity.getId());
         assertThat(result).isPresent();
         var resultAccount = result.get();
-        assertThat(resultAccount).isEqualTo(account);
+        assertThat(resultAccount).isEqualTo(identity);
     }
 
     @Test
     @Rollback
     public void testThatMultipleAccountsCanBeCreatedAndRecalled() {
         User user = userService.createUser(new AuthDto().setEmail("email3@email.com"));
-        Account accountA = accountService.createAccount(Account.builder()
+        Identity identityA = identityService.createAccount(Identity.builder()
                 .user(user)
                 .accountId("accountId2A")
                 .providerId("providerId2A")
                 .build());
-        Account accountB = accountService.createAccount(Account.builder()
+        Identity identityB = identityService.createAccount(Identity.builder()
                 .user(user)
                 .accountId("accountId2B")
                 .providerId("providerId2B")
                 .build());
 
-        Iterable<Account> result = accountRepository.findAll();
+        Iterable<Identity> result = identityRepository.findAll();
         assertThat(result)
                 .hasSize(2)
-                .containsExactly(accountA, accountB);
+                .containsExactly(identityA, identityB);
     }
 
     @Test
     @Rollback
     public void testThatAccountsWithSameProviderIdCannotBeCreated() {
         User user = userService.createUser(new AuthDto().setEmail("email4@email.com"));
-        Account accountA = accountService.createAccount(Account.builder()
+        Identity identityA = identityService.createAccount(Identity.builder()
                 .user(user)
                 .accountId("accountId3A")
                 .providerId("providerId3A")
@@ -93,7 +93,7 @@ class AccountServiceTest {
 
         //
         try {
-            Account accountB = accountService.createAccount(Account.builder()
+            Identity identityB = identityService.createAccount(Identity.builder()
                     .user(user)
                     .accountId("accountId3B")
                     .providerId("providerId3B")
@@ -108,14 +108,14 @@ class AccountServiceTest {
     public void testThatAccountCanBeDeleted() {
         User user = userService.createUser(new AuthDto().setEmail("email5@email.com"));
 
-        Account account = accountService.createAccount(Account.builder()
+        Identity identity = identityService.createAccount(Identity.builder()
                 .user(user)
                 .accountId("accountId4")
                 .providerId("providerId4")
                 .build());
 
-        accountService.deleteAccount(account);
-        Optional<Account> result = accountService.findById(account.getId());
+        identityService.deleteAccount(identity);
+        Optional<Identity> result = identityService.findById(identity.getId());
         assertThat(result).isEmpty();
     }
 
@@ -131,11 +131,11 @@ class AccountServiceTest {
                 .build());
         var updatedPassword = "updatedPassword";
         var updatedHashedPassword = passwordService.encode(updatedPassword);
-        accountService.updatePasswordById(
-                user.getAccount()
+        identityService.updatePasswordById(
+                user.getIdentity()
                         .getId(), updatedHashedPassword
         );
-        var account = accountRepository.findByUserIdAndProviderId(
+        var account = identityRepository.findByUserIdAndProviderId(
                         user.getUser()
                                 .getId(), AuthProvider.CREDENTIALS.toString()
                 )
@@ -154,11 +154,11 @@ class AccountServiceTest {
                 .provider(AuthProvider.GOOGLE)
                 .build());
         var updatedRefreshToken = "updatedRefreshToken";
-        accountService.updateRefreshTokenById(
-                user.getAccount()
+        identityService.updateRefreshTokenById(
+                user.getIdentity()
                         .getId(), updatedRefreshToken
         );
-        var account = accountRepository.findByUserIdAndProviderId(
+        var account = identityRepository.findByUserIdAndProviderId(
                         user.getUser()
                                 .getId(), AuthProvider.GOOGLE.toString()
                 )
@@ -176,16 +176,16 @@ class AccountServiceTest {
                 .accountId("test")
                 .provider(AuthProvider.GOOGLE)
                 .build());
-        var initialUpdatedAt = user.getAccount()
+        var initialUpdatedAt = user.getIdentity()
                 .getUpdatedAt();
 
         TimeUnit.SECONDS.sleep(1);
         var updatedTime = LocalDateTime.now();
-        accountService.updateUpdatedAtById(
-                user.getAccount()
+        identityService.updateUpdatedAtById(
+                user.getIdentity()
                         .getId(), updatedTime
         );
-        var account = accountRepository.findByUserIdAndProviderId(
+        var account = identityRepository.findByUserIdAndProviderId(
                         user.getUser()
                                 .getId(), AuthProvider.GOOGLE.toString()
                 )

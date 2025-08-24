@@ -72,8 +72,8 @@ create table if not exists public.tokens (
 );
 CREATE TRIGGER handle_tokens_updated_at before
 update on public.tokens for each row execute procedure set_current_timestamp_updated_at();
--- -------------- USER ACCOUNTS TABLE START -----------------------------------------------------------------------
-create table if not exists public.accounts (
+-- -------------- USER IDENTITIES TABLE START -----------------------------------------------------------------------
+create table if not exists public.identities (
     id uuid primary key default gen_random_uuid(),
     "user_id" uuid not null references public.users on delete cascade on update cascade,
     provider_id text not null,
@@ -83,7 +83,7 @@ create table if not exists public.accounts (
      * - email: The user's email address.
      * - credentials: `id` returned from the `authorize()` callback
      */
-    account_id varchar(255) not null,
+    account_id text not null,
     password_hash text,
     refresh_token text,
     access_token text,
@@ -94,11 +94,11 @@ create table if not exists public.accounts (
     token_type text,
     created_at timestamptz default clock_timestamp(),
     updated_at timestamptz default clock_timestamp(),
-    constraint accounts_provider_provider_account_id_unique unique (provider_id, account_id),
-    constraint accounts_user_id_provider_unique unique ("user_id", provider_id)
+    constraint identities_provider_provider_account_id_unique unique (provider_id, account_id),
+    constraint identities_user_id_provider_unique unique ("user_id", provider_id)
 );
-CREATE TRIGGER handle_accounts_updated_at before
-update on public.accounts for each row execute procedure set_current_timestamp_updated_at();
+CREATE TRIGGER handle_identities_updated_at before
+update on public.identities for each row execute procedure set_current_timestamp_updated_at();
 -- -------------- USER SESSIONS TABLE START -----------------------------------------------------------------------
 create table if not exists public.sessions (
     id uuid primary key default gen_random_uuid(),

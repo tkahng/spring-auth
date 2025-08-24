@@ -2,7 +2,7 @@ package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.dto.AuthDto;
 import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.repository.AccountRepository;
+import com.tkahng.spring_auth.repository.IdentityRepository;
 import com.tkahng.spring_auth.repository.UserRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class AuthServiceIntegrationTests {
     private Flyway flyway;
 
     @Autowired
-    private AccountRepository accountRepository;
+    private IdentityRepository identityRepository;
     @Autowired
     private AuthService authService;
     @Autowired

@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Account;
+import com.tkahng.spring_auth.domain.Identity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.query.Param;
 
@@ -8,15 +8,15 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AccountService {
+public interface IdentityService {
 
-    Account createAccount(@NotNull Account account);
+    Identity createAccount(@NotNull Identity identity);
 
-    Optional<Account> findByUserIdAndProviderId(UUID userId, String providerId);
+    Optional<Identity> findByUserIdAndProviderId(UUID userId, String providerId);
 
-    Optional<Account> findById(UUID id);
+    Optional<Identity> findById(UUID id);
 
-    void deleteAccount(Account account);
+    void deleteAccount(Identity identity);
 
     int updatePasswordById(UUID id, String passwordHash);
 

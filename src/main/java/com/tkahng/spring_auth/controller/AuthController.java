@@ -21,7 +21,7 @@ public class AuthController {
     private final MailService mailService;
     private final TokenService tokenService;
     private final UserService userService;
-    private final AccountService accountService;
+    private final IdentityService identityService;
 
     @PostMapping("/signup")
     public AuthenticationResponse signup(@RequestBody @NotNull RegisterRequest request) {
@@ -102,7 +102,7 @@ public class AuthController {
         if (userAccount.getUser() == null) {
             throw new EntityNotFoundException("user not found");
         }
-        if (userAccount.getAccount() == null) {
+        if (userAccount.getIdentity() == null) {
             throw new EntityNotFoundException("user account not found");
         }
         mailService.sendResetPasswordMail(userAccount.getUser());
@@ -117,11 +117,11 @@ public class AuthController {
         if (userAccount.getUser() == null) {
             throw new EntityNotFoundException("user not found");
         }
-        if (userAccount.getAccount() == null) {
+        if (userAccount.getIdentity() == null) {
             throw new EntityNotFoundException("user account not found");
         }
         authService.updateAccountPassword(
-                userAccount.getAccount()
+                userAccount.getIdentity()
                         .getId(), request.getPassword()
         );
     }
