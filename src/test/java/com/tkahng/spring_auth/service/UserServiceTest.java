@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth.service;
 
 import com.tkahng.spring_auth.users.User;
-import com.tkahng.spring_auth.dto.AuthDto;
+import com.tkahng.spring_auth.auth.dto.AuthDto;
 import com.tkahng.spring_auth.users.UserRepository;
 import com.tkahng.spring_auth.users.UserService;
 import org.junit.jupiter.api.Test;

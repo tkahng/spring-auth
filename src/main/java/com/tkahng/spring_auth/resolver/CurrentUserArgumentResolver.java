@@ -1,8 +1,8 @@
 package com.tkahng.spring_auth.resolver;
 
 
+import com.tkahng.spring_auth.auth.AuthService;
 import com.tkahng.spring_auth.users.User;
-import com.tkahng.spring_auth.service.AuthService;
 import com.tkahng.spring_auth.users.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

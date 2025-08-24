@@ -1,9 +1,16 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Identity;
-import com.tkahng.spring_auth.users.User;
+import com.tkahng.spring_auth.auth.AuthService;
+import com.tkahng.spring_auth.auth.PasswordService;
+import com.tkahng.spring_auth.auth.TokenService;
+import com.tkahng.spring_auth.auth.dto.AuthDto;
+import com.tkahng.spring_auth.auth.dto.AuthProvider;
+import com.tkahng.spring_auth.auth.dto.AuthenticationResponse;
 import com.tkahng.spring_auth.dto.*;
-import com.tkahng.spring_auth.repository.IdentityRepository;
+import com.tkahng.spring_auth.identities.Identity;
+import com.tkahng.spring_auth.identities.IdentityRepository;
+import com.tkahng.spring_auth.rbac.RbacService;
+import com.tkahng.spring_auth.users.User;
 import com.tkahng.spring_auth.users.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

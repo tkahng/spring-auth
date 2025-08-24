@@ -1,6 +1,6 @@
 package com.tkahng.spring_auth.users;
 
-import com.tkahng.spring_auth.dto.AuthDto;
+import com.tkahng.spring_auth.auth.dto.AuthDto;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;

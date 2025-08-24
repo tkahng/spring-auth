@@ -1,10 +1,13 @@
 package com.tkahng.spring_auth.service;
 
-import com.tkahng.spring_auth.domain.Identity;
+import com.tkahng.spring_auth.auth.AuthService;
+import com.tkahng.spring_auth.auth.PasswordService;
+import com.tkahng.spring_auth.auth.dto.AuthDto;
+import com.tkahng.spring_auth.auth.dto.AuthProvider;
+import com.tkahng.spring_auth.identities.Identity;
+import com.tkahng.spring_auth.identities.IdentityRepository;
+import com.tkahng.spring_auth.identities.IdentityService;
 import com.tkahng.spring_auth.users.User;
-import com.tkahng.spring_auth.dto.AuthDto;
-import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.repository.IdentityRepository;
 import com.tkahng.spring_auth.users.UserRepository;
 import com.tkahng.spring_auth.users.UserService;
 import lombok.extern.slf4j.Slf4j;

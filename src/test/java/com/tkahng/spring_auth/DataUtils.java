@@ -1,7 +1,7 @@
 package com.tkahng.spring_auth;
 
-import com.tkahng.spring_auth.domain.Permission;
-import com.tkahng.spring_auth.domain.Role;
+import com.tkahng.spring_auth.rbac.Permission;
+import com.tkahng.spring_auth.rbac.Role;
 import lombok.NonNull;
 
 public class DataUtils {

@@ -1,8 +1,8 @@
 package com.tkahng.spring_auth.spec;
 
-import com.tkahng.spring_auth.domain.Role;
-import com.tkahng.spring_auth.domain.UserRole;
 import com.tkahng.spring_auth.dto.RoleFilter;
+import com.tkahng.spring_auth.rbac.Role;
+import com.tkahng.spring_auth.rbac.UserRole;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
@@ -56,8 +56,10 @@ public class RoleSpecifications {
             Root<UserRole> rp = subquery.from(UserRole.class);
             subquery.select(rp.get("id")
                             .get("roleId"))
-                    .where(cb.equal(rp.get("id")
-                            .get("userId"), userId));
+                    .where(cb.equal(
+                            rp.get("id")
+                                    .get("userId"), userId
+                    ));
             return root.get("id")
                     .in(subquery);
         };

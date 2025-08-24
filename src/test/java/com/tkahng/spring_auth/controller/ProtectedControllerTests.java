@@ -2,12 +2,12 @@ package com.tkahng.spring_auth.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tkahng.spring_auth.dto.AuthDto;
-import com.tkahng.spring_auth.dto.AuthProvider;
-import com.tkahng.spring_auth.dto.AuthenticationResponse;
-import com.tkahng.spring_auth.service.AuthService;
-import com.tkahng.spring_auth.service.JwtService;
-import com.tkahng.spring_auth.service.RbacService;
+import com.tkahng.spring_auth.auth.AuthService;
+import com.tkahng.spring_auth.auth.JwtService;
+import com.tkahng.spring_auth.auth.dto.AuthDto;
+import com.tkahng.spring_auth.auth.dto.AuthProvider;
+import com.tkahng.spring_auth.auth.dto.AuthenticationResponse;
+import com.tkahng.spring_auth.rbac.RbacService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

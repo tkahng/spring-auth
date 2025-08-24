@@ -1,9 +1,9 @@
 package com.tkahng.spring_auth.spec;
 
-import com.tkahng.spring_auth.domain.Permission;
-import com.tkahng.spring_auth.domain.RolePermission;
-import com.tkahng.spring_auth.domain.UserRole;
 import com.tkahng.spring_auth.dto.PermissionFilter;
+import com.tkahng.spring_auth.rbac.Permission;
+import com.tkahng.spring_auth.rbac.RolePermission;
+import com.tkahng.spring_auth.rbac.UserRole;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
@@ -59,8 +59,10 @@ public class PermissionSpecifications {
             Root<RolePermission> rp = subquery.from(RolePermission.class);
             subquery.select(rp.get("id")
                             .get("permissionId"))
-                    .where(cb.equal(rp.get("id")
-                            .get("roleId"), roleId));
+                    .where(cb.equal(
+                            rp.get("id")
+                                    .get("roleId"), roleId
+                    ));
             return root.get("id")
                     .in(subquery);
         };
@@ -76,11 +78,15 @@ public class PermissionSpecifications {
                             .get("permissionId"))
                     .distinct(true)
                     .where(
-                            cb.equal(urRoot.get("id")
-                                    .get("userId"), userId),
-                            cb.equal(urRoot.get("id")
-                                    .get("roleId"), rpRoot.get("id")
-                                    .get("roleId"))
+                            cb.equal(
+                                    urRoot.get("id")
+                                            .get("userId"), userId
+                            ),
+                            cb.equal(
+                                    urRoot.get("id")
+                                            .get("roleId"), rpRoot.get("id")
+                                            .get("roleId")
+                            )
                     );
 
             return root.get("id")
@@ -97,8 +103,10 @@ public class PermissionSpecifications {
             Root<UserRole> ur = rolesSubquery.from(UserRole.class);
             rolesSubquery.select(ur.get("id")
                             .get("roleId"))
-                    .where(cb.equal(ur.get("id")
-                            .get("userId"), userId));
+                    .where(cb.equal(
+                            ur.get("id")
+                                    .get("userId"), userId
+                    ));
 
             // Subquery to get permission IDs from those roles
             Subquery<UUID> permsSubquery = query.subquery(UUID.class);
