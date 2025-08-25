@@ -8,10 +8,16 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db
-
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 #  rabbitmq:
 #    image: rabbitmq:3-management-alpine
 #    container_name: 'rabbitmq'
 #    ports:
 #      - 5672:5672
 #      - 15672:15672
+
+volumes:
+  postgres-data:
